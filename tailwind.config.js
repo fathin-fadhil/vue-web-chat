@@ -17,13 +17,13 @@ module.exports = {
             colors: {
                 'primary': '#327b6d',
                 'secondary': '#c9e9e2',
-                'accent': '#43a390',
+                'accent': '#597870',
                 'text': '#0a1a17',
                 'background': '#edf8f5',
                 
                 'primary-dark': '#84cdbe',
                 'secondary-dark': '#16362f',
-                'accent-dark': '#5cbca9',
+                'accent-dark': '#87A69E',
                 'text-dark': '#e5f5f2',
                 'background-dark': '#07120f',
             }

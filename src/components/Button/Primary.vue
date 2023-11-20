@@ -1,16 +1,15 @@
 <template>
-  <button class="bg-blue-400 p-2 rounded-md text-white hover:bg-blue-500" :type="type">
-    <slot/>
+  <button class="px-8 py-2 bg-primary hover:brightness-75 transition-all duration-all dark:bg-primary-dark text-white dark:text-black rounded-lg font-semibold" :type="props.type">
+    <slot />
   </button>
 </template>
 
-<script>
-export default {
-  props: {
-    type: {
-      type: String,
-      default: 'button',
-    },
+<script setup>
+const props = defineProps({
+  'type': {
+    type: String,
+    default: 'button'
   }
-}
+})
+
 </script>

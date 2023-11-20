@@ -7,6 +7,7 @@ import MainLayout from '@/layouts/MainLayout.vue';
 
 // middleware
 import AuthMiddleware from '@/middleware/auth.middleware.js';
+import GuestMiddleware from '@/middleware/guest.middleware.js';
 
 export default [{
     path: '/',
@@ -15,7 +16,7 @@ export default [{
     meta: {
       title: 'Home',
       layout: MainLayout,
-      middleware: [AuthMiddleware],
+      middleware: [GuestMiddleware],
     },
   },
   {

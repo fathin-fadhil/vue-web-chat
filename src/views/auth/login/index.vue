@@ -1,30 +1,13 @@
-<template>
-  <h1 class="font-semibold text-lg ">Login Page</h1>
-  <form action="" @submit.prevent="login">
-    <div class="mb-6">
-        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 ">Email address</label>
-        <input v-model="formData.email" type="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="john.doe@company.com" required>
-    </div>
-    <div class="mb-6 bg-background dark:bg-background-dark">
-        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 ">Password</label>
-        <input v-model="formData.password" type="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="•••••••••" required>
-    </div>
-    <ButtonPrimary :type="'submit'">
-      Login
-    </ButtonPrimary>
-    <ButtonDanger @click="$router.push('/register')" class="ml-3">
-      Register
-    </ButtonDanger>
-  </form>
-  <button @click="toggleDark">dark mode toggle</button>
-
-</template>
-
 <script setup>
 import { useAuthStore } from "../../../stores/auth.store"
 import { reactive } from "@vue/reactivity";
+import PrimaryButton from '../../../components/Button/Primary.vue'
+import Moon from '../../../components/icons/Moon.vue'
+import Sun from '../../../components/icons/Sun.vue'
+import useThemeStore from '../../../stores/theme.store'
 
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 
 const formData =  reactive({
   email: "",
@@ -35,26 +18,28 @@ function login() {
   authStore.login(formData)
 }
 
-function toggleDark() {
-  if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'light') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-        }
-
-    // if NOT set via local storage previously
-    } else {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-        }
-    }
-}
-
 </script>
+
+
+<template>
+  <div class=" min-h-screen w-full grid place-items-center p-4 relative ">
+    <button @click="themeStore.toggleTheme" class=" absolute top-4 right-4 p-4 text-primary dark:text-primary-dark rounded-lg hover:bg-secondary dark:hover:bg-secondary-dark transition-all duration-300">
+      <Sun v-if="themeStore.isDarkTheme" class=" w-7 h-7"></Sun>
+      <Moon v-else class=" w-7 h-7"></Moon>
+    </button>
+    <main class=" p-4 rounded-xl bg-secondary/40 dark:bg-white/5 w-full max-w-2xl">
+      <form>
+        <div class="mb-6">
+          <label for="email" class="block mb-2 text-sm font-semibold">Your email</label>
+          <input type="email" id="email" class=" transition-all duration-300 bg-gray-50 border-2 border-gray-200  text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-teal-500/5 dark:border-gray-600/20 dark:placeholder-gray-400  dark:focus:ring-teal-500 dark:focus:border-teal-500" placeholder="name@example.com" required>
+        </div>
+        <div class="mb-6">
+          <label for="password" class="block mb-2 text-sm font-semibold">Your password</label>
+          <input type="password" id="password" class=" transition-all duration-300 bg-gray-50 border-2 border-gray-200  text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-teal-500/5 dark:border-gray-600/20 dark:placeholder-gray-400  dark:focus:ring-teal-500 dark:focus:border-teal-500" placeholder="*********" required>
+        </div>
+        <p class=" text-sm mb-6">Don't have an account? <router-link class=" text-teal-600 hover:underline" to="/register">Register</router-link></p>
+        <PrimaryButton @click="$router.push('/')">Login</PrimaryButton>
+      </form>
+    </main>
+  </div>
+</template>

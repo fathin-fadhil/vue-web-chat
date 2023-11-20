@@ -1,0 +1,28 @@
+import { defineStore } from "pinia";
+import { ref } from "@vue/reactivity";
+
+function isDarkThemeInit() {
+  if (localStorage.getItem('color-theme')) {
+    return localStorage.getItem('color-theme') === 'light' ? false : true;
+  } else {
+    return document.documentElement.classList.contains('dark') ? true : false;
+  }
+}
+
+export default defineStore("theme", () => {
+  const isDarkTheme = ref(isDarkThemeInit());
+
+  function toggleTheme() {
+    if (isDarkTheme.value) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('color-theme', 'light')
+      isDarkTheme.value = false;
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('color-theme', 'dark');
+      isDarkTheme.value = true;
+    }
+  }
+
+  return { isDarkTheme, toggleTheme };
+})
