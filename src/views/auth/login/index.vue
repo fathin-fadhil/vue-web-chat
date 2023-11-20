@@ -1,5 +1,5 @@
 <template>
-  <h1 class="font-semibold text-lg">Login Page</h1>
+  <h1 class="font-semibold text-lg ">Login Page</h1>
   <form action="" @submit.prevent="login">
     <div class="mb-6">
         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 ">Email address</label>

@@ -1,4 +1,4 @@
-import './assets/main.css'
+// import './assets/main.css'
 import 'remixicon/fonts/remixicon.css';
 import 'vue3-toastify/dist/index.css';
 import 'sweetalert2/dist/sweetalert2.min.css';
