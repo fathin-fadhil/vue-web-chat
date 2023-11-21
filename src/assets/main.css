@@ -13,3 +13,13 @@ body {
 input {
   @apply focus:outline-none;
 }
+
+::-webkit-scrollbar-thumb {
+  @apply bg-black/20 dark:bg-white/10;
+  border-radius: 10px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar {
+  width: 17px;
+}

@@ -9,7 +9,7 @@ function isDarkThemeInit() {
   }
 }
 
-export default defineStore("theme", () => {
+export const useThemeStore = defineStore("theme", () => {
   const isDarkTheme = ref(isDarkThemeInit());
 
   function toggleTheme() {

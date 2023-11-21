@@ -4,7 +4,7 @@ import { reactive } from "@vue/reactivity";
 import PrimaryButton from '../../../components/Button/Primary.vue'
 import Moon from '../../../components/icons/Moon.vue'
 import Sun from '../../../components/icons/Sun.vue'
-import useThemeStore from '../../../stores/theme.store'
+import { useThemeStore } from '../../../stores/theme.store'
 
 const authStore = useAuthStore()
 const themeStore = useThemeStore()

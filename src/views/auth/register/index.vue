@@ -2,7 +2,7 @@
 import { useAuthStore } from "@/stores/auth.store.js"
 import PrimaryButton from "../../../components/Button/Primary.vue";
 import { reactive } from "@vue/reactivity";
-import useThemeStore from '../../../stores/theme.store'
+import { useThemeStore } from '../../../stores/theme.store'
 import Moon from '../../../components/icons/Moon.vue'
 import Sun from '../../../components/icons/Sun.vue'
 
