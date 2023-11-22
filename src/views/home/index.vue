@@ -5,6 +5,7 @@ import { ref } from "@vue/reactivity";
 import Sun from '../../components/icons/Sun.vue';
 import Moon from '../../components/icons/Moon.vue';
 import Search from '../../components/icons/Search.vue';
+import PrimaryButton from '../../components/Button/Primary.vue';
 import ChevronLeft from '../../components/icons/ChevronLeft.vue';
 import Close from '../../components/icons/Close.vue'
 import { getActiveBrekpoint } from '../../helper/tailwindBreakpoint';
@@ -74,8 +75,8 @@ function updateBreakpoint() {
 <template>
   <main class="flex flex-row w-full min-h-[100dvh]">
     <Transition name="slide-left">
-      <section v-if="!['default', 'xs', 'sm'].includes(activeBreakpoint) || selectedChatUserId === -1" class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-2" >
-        <div class=" flex gap-4 shrink-0">
+      <section v-if="!['default', 'xs', 'sm'].includes(activeBreakpoint) || selectedChatUserId === -1" class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
+        <div class=" flex gap-4 shrink-0 bg-white/40 dark:bg-white/5 px-2 py-4 rounded-xl backdrop-blur-[2px] shadow-sm ">
           <img src="https://picsum.photos/500" alt="user profile picture" class=" w-12 aspect-square object-cover rounded-full shrink-0">
           <div class=" grow text-sm flex flex-col justify-center">
             <p class=" font-bold text-base">This User</p>
@@ -90,13 +91,19 @@ function updateBreakpoint() {
           </div>
         </div>
   
-        <div class=" bg-secondary/50 dark:bg-secondary-dark/20 grow rounded-2xl flex-col shadow-xl flex " >
-          <div class="relative w-full shrink-0 p-2">
-            <input type="text" v-model="search" class=" p-2 bg-background dark:bg-secondary-dark/50 w-full rounded-2xl text-sm" placeholder="Search...">
-            <Search v-if="!search" class=" w-4 h-4 absolute top-[50%] -translate-y-[50%] right-4 text-[17px]" />
-            <button v-else class=" hover:cursor-pointer absolute top-[50%] -translate-y-[50%] right-4 text-[17px]" @click="search = ''" >
-              <Close  class=" w-5 h-5 " />
-            </button>
+        <div class=" bg-secondary/50 dark:bg-secondary-dark/20 grow rounded-2xl flex-col shadow-xl flex backdrop-blur-sm" >
+          <div class="my-4 px-4">
+            <div class="flex mb-4 justify-between">
+              <h1 class=" text-2xl font-bold ">All Rooms</h1>
+              <PrimaryButton class=" text-text dark:text-text-dark dark:bg-primary-dark/70 text-xs !px-2 !py-[1px]">+ New Room</PrimaryButton>
+            </div>
+            <div class="relative w-full shrink-0">
+              <input type="text" v-model="search" class=" p-2 bg-background dark:bg-secondary-dark/50 w-full rounded-xl text-base" placeholder="Search...">
+              <Search v-if="!search" class=" w-4 h-4 absolute top-[50%] -translate-y-[50%] right-4" />
+              <button v-else class=" hover:cursor-pointer absolute top-[50%] -translate-y-[50%] right-4" @click="search = ''" >
+                <Close  class=" w-5 h-5 " />
+              </button>
+            </div>
           </div>
           <div class=" grow h-1  overflow-y-auto" :class="themeStore.isDarkTheme ? 'dark' : ''">
             <div @click="selectedChatUserId = item.userId" v-for="(item, index) in arr" :key="index" :class="selectedChatUserId === item.userId ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
@@ -120,7 +127,7 @@ function updateBreakpoint() {
     <section class=" relative grow py-4 pr-4 pl-4 md:pl-0" :class="selectedChatUserId === -1 && 'mobile-hide'">
       <Transition name="slide" mode="out-in">
         <div v-if="selectedChatUserId !== -1" class="w-full h-full">
-          <div class=" w-full bg-secondary/50 dark:bg-secondary-dark/20 flex gap-2 p-4 rounded-2xl items-center">        
+          <div class=" w-full backdrop-blur-sm bg-secondary/50 dark:bg-secondary-dark/20 flex gap-2 p-4 rounded-2xl items-center">        
             <button @click="selectedChatUserId = -1" class=" p-2 hover:bg-secondary dark:hover:bg-secondary-dark rounded-full transition-colors duration-300">
               <ChevronLeft class=" w-6 aspect-square" />
             </button>
