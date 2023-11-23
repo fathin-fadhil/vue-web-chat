@@ -8,20 +8,23 @@ import Search from '../../components/icons/Search.vue';
 import Logout from '../../components/icons/Logout.vue'
 import ChevronLeft from '../../components/icons/ChevronLeft.vue';
 import Close from '../../components/icons/Close.vue'
-import { onMounted } from 'vue';
+import { onMounted, watch, watchEffect } from 'vue';
 import MoreOption from '../../components/Menu/RoomMoreOption.vue'
 import { useAuthStore } from "../../stores/auth.store";
 import ConfirmSignout from "../../components/Modal/ConfirmSignout.vue";
 import BrowseRoom from "../../components/Modal/BrowseRoom.vue";
+import { useAutoAnimate } from "@formkit/auto-animate/vue";
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
 const roomStore = useRoomStore()
+const [ parent ] = useAutoAnimate()
 
 const selectedChatUserId = ref(-1)
 const search = ref('')
+const filteredRooms = ref(roomStore.searchJoinedRoomByName(search.value))
 const logoutModal = ref(false)
-const browseModal = ref(false)
+const browseModal = ref(true)
 
 function handleRoomChange(item) {
   if (selectedChatUserId.value === -1) {
@@ -40,6 +43,10 @@ onMounted(() => {
   })
 })
 
+watch([search, () => roomStore.joinedRooms], () => {
+  console.log('ran')
+  filteredRooms.value = roomStore.searchJoinedRoomByName(search.value)
+})
 </script>
 
 <template>
@@ -69,24 +76,25 @@ onMounted(() => {
               <MoreOption @browseClick="browseModal = !browseModal"/>
             </div>
             <div class="relative w-full shrink-0">
-              <input type="text" v-model="search" class=" p-2 bg-background dark:bg-secondary-dark/50 w-full rounded-xl text-base" placeholder="Search...">
+              <input type="text" v-model="search" class=" p-2 bg-background focus:ring-1 ring-teal-500/50 dark:bg-secondary-dark/50 w-full rounded-xl text-base" placeholder="Search...">
               <Search v-if="!search" class=" w-4 h-4 absolute top-[50%] -translate-y-[50%] right-4" />
               <button v-else class=" hover:cursor-pointer absolute top-[50%] -translate-y-[50%] right-4" @click="search = ''" >
                 <Close  class=" w-5 h-5 " />
               </button>
             </div>
           </div>
-          <div class=" grow h-1  overflow-y-auto" :class="themeStore.isDarkTheme ? 'dark' : ''">
-            <div @click="() => handleRoomChange(room.id)" v-for="(room, index) in roomStore.joinedRooms" :key="room.id" :class="selectedChatUserId === room.id ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
-                <img src="https://picsum.photos/400/300" alt="user profile picture" class=" h-12 aspect-square object-cover rounded-full shrink-0">
-                <div class=" grow text-sm flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
-                  <div class=" flex align-bottom">
-                    <p class=" font-semibold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
-                    <span class=" text-[10px] shrink-0">10/23/2077</span>
-                  </div>
-                  <div class="flex gap-2">
-                    <p class="grow text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden ">awfwafwafwa wa awafwa oiwaoinofoaw</p>
-                    <span class=" shrink-0 w-5 text-xs grid place-content-center aspect-square ml-auto text-white rounded-full bg-red-500">1</span>
+          <div ref="parent" class=" grow h-1  overflow-y-auto" :class="themeStore.isDarkTheme ? 'dark' : ''">
+            <p v-if="filteredRooms.length === 0" class=" text-center font-semibold" key="not-found">No Rooms Found</p>
+            <div @click="() => handleRoomChange(room.id)" v-for="(room, index) in filteredRooms" :key="room.id" :class="selectedChatUserId === room.id ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
+              <img src="https://picsum.photos/400/300" alt="user profile picture" class=" h-12 aspect-square object-cover rounded-full shrink-0">
+              <div class=" grow text-sm flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
+                <div class=" flex align-bottom">
+                  <p class=" font-semibold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
+                  <span class=" text-[10px] shrink-0">10/23/2077</span>
+                </div>
+                <div class="flex gap-2">
+                  <p class="grow text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden ">awfwafwafwa wa awafwa oiwaoinofoaw</p>
+                  <span class=" shrink-0 w-5 text-xs grid place-content-center aspect-square ml-auto text-white rounded-full bg-red-500">1</span>
                 </div>
               </div>
             </div>

@@ -23,14 +23,14 @@ function close() {
     </button>
     <Transition name="slide" >
       <ul v-if="moreOptionDropdown" class=" text-sm w-max shadow-lg transition-all origin-top top-12 duration-300 ease-in-out rounded-xl py-2 absolute right-0 bg-white dark:bg-secondary-dark font-semibold">
-        <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300 ">
-          <button @click="emits('browseClick')" class=" flex gap-2 items-center p-2" >
+        <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300">
+          <button @click="emits('browseClick')" class=" flex gap-2 items-center py-2 px-4" >
             <Search class=" w-5 h-5" />
             Browse New Room
           </button>
         </li>
-        <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300 ">
-          <button class=" flex gap-2 items-center p-2" >
+        <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300">
+          <button class=" flex gap-2 items-center py-2 px-4" >
             <Plus />
             Create New Room
           </button>

@@ -8,6 +8,7 @@ import { onMounted, watch } from 'vue';
 import { useAutoAnimate } from "@formkit/auto-animate/vue";
 import PrimaryButton from '../../components/Button/Primary.vue'
 import SecondaryButton from '../../components/Button/Secondary.vue'
+import Spinner from '../icons/Spinner.vue';
 
 defineProps({
   showModal: {
@@ -35,9 +36,8 @@ onMounted(async () => {
   isLoading.value = false
 })
 
-watch([search, roomStore.rooms], () => {
+watch([search, () => roomStore.rooms], () => {
   rooms.value = roomStore.searchRoomByName(search.value)
-  console.log('changed')
 })
 
 function handleJoin(roomId) {
@@ -61,7 +61,12 @@ function handleJoin(roomId) {
               <Close  class=" w-5 h-5 " />
             </button>
           </div>
-          <div ref="parent" class=" flex flex-col grow h-0 overflow-y-auto">
+          <div ref="parent" class=" flex flex-col grow h-0 overflow-y-auto relative">
+            <p v-if="rooms.length === 0 && !isLoading" class="  text-center font-semibold mt-2" key="not-found">No Rooms Found</p>
+            <div role="status" v-if="isLoading && rooms.length === 0" class=" flex rounded-xl dark:bg-gray-50/5 p-4 flex-col absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] gap-2 justify-center items-center">
+                <Spinner class=" w-8 h-8" />
+                <span class="font-semibold">Loading Data</span>
+            </div>
             <div class=" flex gap-4 py-4 dark:hover:bg-black/20 hover:bg-white/30 transition-colors px-4 border-slate-500/50 border-b-[1px]" v-for="(room, index) in rooms" :key="room.id">
               <span class=" flex justify-center items-center">
                 <UsersGroup class="w-6 h-6" />

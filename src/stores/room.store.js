@@ -22,9 +22,13 @@ export const useRoomStore = defineStore('room', () => {
     return rooms.value.filter(room => room.name.toLowerCase().includes(searchWord.toLowerCase()))
   }
 
+  function searchJoinedRoomByName(searchWord) {
+    return joinedRooms.value.filter(room => room.name.toLowerCase().includes(searchWord.toLowerCase()))
+  }
+
   function joinRoom(roomId) {
     const roomToBeAdded = rooms.value.find(room => room.id === roomId)
-    joinedRooms.value.push(roomToBeAdded)
+    joinedRooms.value = [...joinedRooms.value, roomToBeAdded]
     localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
   }
 
@@ -37,5 +41,5 @@ export const useRoomStore = defineStore('room', () => {
     return joinedRooms.value.find(room => room.id === roomId)
   }
 
-  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, exitRoom, checkAlreadyInRoom }
+  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName }
 })
