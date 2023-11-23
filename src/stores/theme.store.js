@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "@vue/reactivity";
+import { getActiveBrekpoint } from '../helper/tailwindBreakpoint';
+import { onMounted, onUnmounted } from "vue";
 
 function isDarkThemeInit() {
   if (localStorage.getItem('color-theme')) {
@@ -11,6 +13,7 @@ function isDarkThemeInit() {
 
 export const useThemeStore = defineStore("theme", () => {
   const isDarkTheme = ref(isDarkThemeInit());
+  const activeBreakpoint = ref(getActiveBrekpoint())
 
   function toggleTheme() {
     if (isDarkTheme.value) {
@@ -24,5 +27,17 @@ export const useThemeStore = defineStore("theme", () => {
     }
   }
 
-  return { isDarkTheme, toggleTheme };
+  onMounted(() => {
+    addEventListener('resize', updateBreakpoint)    
+  })
+
+  onUnmounted(() => {
+    removeEventListener('resize', updateBreakpoint)
+  })
+
+  function updateBreakpoint() {
+    activeBreakpoint.value = getActiveBrekpoint()
+  }
+
+  return { isDarkTheme, activeBreakpoint, toggleTheme };
 })

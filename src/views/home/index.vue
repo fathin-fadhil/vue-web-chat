@@ -8,8 +8,7 @@ import Search from '../../components/icons/Search.vue';
 import Logout from '../../components/icons/Logout.vue'
 import ChevronLeft from '../../components/icons/ChevronLeft.vue';
 import Close from '../../components/icons/Close.vue'
-import { getActiveBrekpoint } from '../../helper/tailwindBreakpoint';
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted } from 'vue';
 import MoreOption from '../../components/Menu/RoomMoreOption.vue'
 import { useAuthStore } from "../../stores/auth.store";
 import ConfirmSignout from "../../components/Modal/ConfirmSignout.vue";
@@ -21,22 +20,8 @@ const roomStore = useRoomStore()
 
 const selectedChatUserId = ref(-1)
 const search = ref('')
-const activeBreakpoint = ref(getActiveBrekpoint())
 const logoutModal = ref(false)
 const browseModal = ref(false)
-
-onMounted(() => {
-  addEventListener('resize', updateBreakpoint)
-  console.log(roomStore.joinedRooms)
-})
-
-onUnmounted(() => {
-  removeEventListener('resize', updateBreakpoint)
-})
-
-function updateBreakpoint() {
-  activeBreakpoint.value = getActiveBrekpoint()
-}
 
 function handleRoomChange(item) {
   if (selectedChatUserId.value === -1) {
@@ -53,8 +38,6 @@ onMounted(() => {
       selectedChatUserId.value = -1
     }
   })
-
-  roomStore.getRooms()
 })
 
 </script>
@@ -62,7 +45,7 @@ onMounted(() => {
 <template>
   <main class="flex flex-row w-full min-h-[100dvh]">
     <Transition name="slide-left">
-      <section v-if="!['default', 'xs', 'sm'].includes(activeBreakpoint) || selectedChatUserId === -1" class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
+      <section v-if="!['default', 'xs', 'sm'].includes(themeStore.activeBreakpoint) || selectedChatUserId === -1" class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
         <div class=" flex gap-4 shrink-0 bg-white/40 dark:bg-white/5 px-2 py-4 rounded-xl backdrop-blur-[2px] shadow-sm z-40">
           <img src="https://picsum.photos/500" alt="user profile picture" class=" w-12 aspect-square object-cover rounded-full shrink-0">
           <div class=" grow text-sm flex flex-col justify-center">
