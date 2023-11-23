@@ -1,8 +1,11 @@
 import { defineStore } from 'pinia';
 import router from '@/router/index.js';
 import { ref } from "@vue/reactivity";
+import { useRoomStore } from './room.store';
+
 
 export const useAuthStore = defineStore('auth', () => {
+    const roomStore = useRoomStore()
     const username = ref(localStorage.getItem('username'))
 
     function login(usernameInfo) {
@@ -13,7 +16,8 @@ export const useAuthStore = defineStore('auth', () => {
 
     function logout() {
         username.value = null;
-        localStorage.removeItem('username');
+        localStorage.clear();
+        roomStore.resetState()
         router.push({ name: 'login'})
     }
 

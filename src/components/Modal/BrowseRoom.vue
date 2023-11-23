@@ -63,7 +63,7 @@ function handleJoin(roomId) {
           </div>
           <div ref="parent" class=" flex flex-col grow h-0 overflow-y-auto relative">
             <p v-if="rooms.length === 0 && !isLoading" class="  text-center font-semibold mt-2" key="not-found">No Rooms Found</p>
-            <div role="status" v-if="isLoading && rooms.length === 0" class=" flex rounded-xl dark:bg-gray-50/5 p-4 flex-col absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] gap-2 justify-center items-center">
+            <div role="status" v-if="isLoading && rooms.length === 0" class=" flex rounded-xl bg-black/5 dark:bg-gray-50/5 p-4 flex-col absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] gap-2 justify-center items-center">
                 <Spinner class=" w-8 h-8" />
                 <span class="font-semibold">Loading Data</span>
             </div>

@@ -41,5 +41,10 @@ export const useRoomStore = defineStore('room', () => {
     return joinedRooms.value.find(room => room.id === roomId)
   }
 
-  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName }
+  function resetState() {
+    rooms.value = []
+    joinedRooms.value = []
+  }
+
+  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState }
 })

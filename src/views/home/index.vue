@@ -24,7 +24,7 @@ const selectedChatUserId = ref(-1)
 const search = ref('')
 const filteredRooms = ref(roomStore.searchJoinedRoomByName(search.value))
 const logoutModal = ref(false)
-const browseModal = ref(true)
+const browseModal = ref(false)
 
 function handleRoomChange(item) {
   if (selectedChatUserId.value === -1) {
@@ -41,6 +41,9 @@ onMounted(() => {
       selectedChatUserId.value = -1
     }
   })
+  if (roomStore.joinedRooms.length === 0) {
+    browseModal.value = true
+  }
 })
 
 watch([search, () => roomStore.joinedRooms], () => {
