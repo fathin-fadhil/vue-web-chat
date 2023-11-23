@@ -11,6 +11,7 @@ import { getActiveBrekpoint } from '../../helper/tailwindBreakpoint';
 import { onMounted, onUnmounted, watch, watchEffect } from 'vue';
 import MoreOption from '../../components/Menu/RoomMoreOption.vue'
 import { useAuthStore } from "../../stores/auth.store";
+import ConfirmSignout from "../../components/Modal/ConfirmSignout.vue";
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
@@ -60,6 +61,7 @@ const arr = [
 const selectedChatUserId = ref(-1)
 const search = ref('')
 const activeBreakpoint = ref(getActiveBrekpoint())
+const logoutModal = ref(false)
 
 onMounted(() => {
   addEventListener('resize', updateBreakpoint)
@@ -88,7 +90,7 @@ function updateBreakpoint() {
               <Sun v-if="themeStore.isDarkTheme" class=" w-6 h-6"></Sun>
               <Moon v-else class=" w-6 h-6"></Moon>
             </button>
-            <button @click="authStore.logout" class=" text-text hover:text-red-500 dark:hover:text-red-500 dark:text-text-dark rounded-lg hover:bg-red-100 dark:hover:bg-red-600/10 transition-all duration-300 p-2">
+            <button @click="logoutModal = true" class=" text-text hover:text-red-500 dark:hover:text-red-500 dark:text-text-dark rounded-lg hover:bg-red-100 dark:hover:bg-red-600/10 transition-all duration-300 p-2">
               <Logout class="w-6 h-6"/>
             </button>
           </div>
@@ -145,6 +147,8 @@ function updateBreakpoint() {
       </Transition>
     </section>
   </main>
+
+  <ConfirmSignout @toggle="(value) => logoutModal = value " :showModal="logoutModal" />
 </template>
 
 <style scoped>
