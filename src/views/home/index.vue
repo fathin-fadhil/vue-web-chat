@@ -74,6 +74,23 @@ onUnmounted(() => {
 function updateBreakpoint() {
   activeBreakpoint.value = getActiveBrekpoint()
 }
+
+function handleRoomChange(item) {
+  if (selectedChatUserId.value === -1) {
+    selectedChatUserId.value = item.userId; 
+    window.history.pushState({}, null, null)
+  } else {
+    selectedChatUserId.value = item.userId; 
+  }
+}
+
+onMounted(() => {
+  addEventListener('popstate', () => {
+    if (selectedChatUserId.value !== -1) {
+      selectedChatUserId.value = -1
+    }
+  })
+})
 </script>
 
 <template>
@@ -111,7 +128,7 @@ function updateBreakpoint() {
             </div>
           </div>
           <div class=" grow h-1  overflow-y-auto" :class="themeStore.isDarkTheme ? 'dark' : ''">
-            <div @click="selectedChatUserId = item.userId" v-for="(item, index) in arr" :key="index" :class="selectedChatUserId === item.userId ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
+            <div @click="() => handleRoomChange(item)" v-for="(item, index) in arr" :key="index" :class="selectedChatUserId === item.userId ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
                 <img src="https://picsum.photos/400/300" alt="user profile picture" class=" h-12 aspect-square object-cover rounded-full shrink-0">
                 <div class=" grow text-sm flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
                   <div class=" flex align-bottom">
