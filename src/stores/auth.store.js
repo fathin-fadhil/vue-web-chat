@@ -1,43 +1,23 @@
 import { defineStore } from 'pinia';
-import { getActivePinia } from "pinia"
-import { axiosWrapper } from '@/helper/axios-wrapper.js';
-
 import router from '@/router/index.js';
+import { ref } from "@vue/reactivity";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
-export const useAuthStore = defineStore({
-    id: 'auth',
-    state: () => ({
-        user: JSON.parse(localStorage.getItem('user')),
-        authError: null
-    }),
-    actions: {
-        async login(data) {
-            const user = await axiosWrapper.post(`${baseUrl}/login`, data, true);
+export const useAuthStore = defineStore('auth', () => {
+    const username = ref(localStorage.getItem('username'))
 
-            if (user.status == 200) {
-                this.user = user.data;
+    function login(usernameInfo) {
+        username.value = usernameInfo;
+        localStorage.setItem('username', usernameInfo);
+        router.push({ name: 'home'})
+    }
 
-                localStorage.setItem('user', JSON.stringify(user.data));
+    function logut() {
+        username.value = null;
+        localStorage.removeItem('username');
+        router.push({ name: 'login'})
+    }
 
-                router.push('/');
-            }
-        },
-        async register(data) {
-            let register = await axiosWrapper.post(`${baseUrl}/register`, data, true);
-
-            if (register) {
-                router.push('/login');
-            }
-        },
-        async logout() {
-            this.user = null;
-
-            localStorage.removeItem('user');
-            router.push('/login');
-
-            getActivePinia()._s.forEach(store => store.$reset());
-        }
-    },
-});
+    return { username, login, logut }
+}) 

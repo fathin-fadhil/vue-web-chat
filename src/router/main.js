@@ -16,7 +16,7 @@ export default [{
     meta: {
       title: 'Home',
       layout: MainLayout,
-      middleware: [GuestMiddleware],
+      middleware: [AuthMiddleware],
     },
   },
   {

@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/auth.store.js';
 import { useSegmentStore } from '@/stores/segment.store.js';
 
 export default ({ to, from, next }) => {
-  const auth = useAuthStore();
+  const authStore = useAuthStore();
   const segment = useSegmentStore();
 
   if(to.meta.group){
@@ -11,8 +11,8 @@ export default ({ to, from, next }) => {
     segment.setSegment(to.fullPath)
   }
 
-  if (!auth.user) {
-    auth.returnUrl = to.fullPath;
+  if (!authStore.username) {
+    authStore.returnUrl = to.fullPath;
 
     return next({
       name: 'login',
