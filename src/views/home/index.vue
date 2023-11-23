@@ -1,17 +1,19 @@
 <script setup>
-import Bell from '../../components/icons/Bell.vue';
 import { useThemeStore } from "../../stores/theme.store";
 import { ref } from "@vue/reactivity";
 import Sun from '../../components/icons/Sun.vue';
 import Moon from '../../components/icons/Moon.vue';
 import Search from '../../components/icons/Search.vue';
-import PrimaryButton from '../../components/Button/Primary.vue';
+import Logout from '../../components/icons/Logout.vue'
 import ChevronLeft from '../../components/icons/ChevronLeft.vue';
 import Close from '../../components/icons/Close.vue'
 import { getActiveBrekpoint } from '../../helper/tailwindBreakpoint';
 import { onMounted, onUnmounted, watch, watchEffect } from 'vue';
+import MoreOption from '../../components/Menu/RoomMoreOption.vue'
+import { useAuthStore } from "../../stores/auth.store";
 
 const themeStore = useThemeStore()
+const authStore = useAuthStore()
 
 const arr = [
   {
@@ -76,26 +78,27 @@ function updateBreakpoint() {
   <main class="flex flex-row w-full min-h-[100dvh]">
     <Transition name="slide-left">
       <section v-if="!['default', 'xs', 'sm'].includes(activeBreakpoint) || selectedChatUserId === -1" class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
-        <div class=" flex gap-4 shrink-0 bg-white/40 dark:bg-white/5 px-2 py-4 rounded-xl backdrop-blur-[2px] shadow-sm ">
+        <div class=" flex gap-4 shrink-0 bg-white/40 dark:bg-white/5 px-2 py-4 rounded-xl backdrop-blur-[2px] shadow-sm z-40">
           <img src="https://picsum.photos/500" alt="user profile picture" class=" w-12 aspect-square object-cover rounded-full shrink-0">
           <div class=" grow text-sm flex flex-col justify-center">
-            <p class=" font-bold text-base">This User</p>
-            <p class=" ">@username</p>
+            <p class=" font-bold text-base">{{ authStore.username }}</p>
           </div>
           <div class=" flex justify-center items-center gap-2">
             <button @click="themeStore.toggleTheme" class=" text-text dark:text-text-dark rounded-lg hover:bg-secondary dark:hover:bg-secondary-dark transition-all duration-300 p-2">
               <Sun v-if="themeStore.isDarkTheme" class=" w-6 h-6"></Sun>
               <Moon v-else class=" w-6 h-6"></Moon>
             </button>
-            <Bell class=" w-6 h-6 text-text dark:text-text-dark" />
+            <button @click="authStore.logout" class=" text-text hover:text-red-500 dark:hover:text-red-500 dark:text-text-dark rounded-lg hover:bg-red-100 dark:hover:bg-red-600/10 transition-all duration-300 p-2">
+              <Logout class="w-6 h-6"/>
+            </button>
           </div>
         </div>
   
-        <div class=" bg-secondary/50 dark:bg-secondary-dark/20 grow rounded-2xl flex-col shadow-xl flex backdrop-blur-sm" >
+        <div class=" bg-secondary/50 dark:bg-secondary-dark/20 grow rounded-2xl flex-col shadow-xl flex backdrop-blur-sm z-10" >
           <div class="my-4 px-4">
-            <div class="flex mb-4 justify-between">
+            <div class="flex mb-3 justify-between items-center">
               <h1 class=" text-2xl font-bold ">All Rooms</h1>
-              <PrimaryButton class=" text-text dark:text-text-dark dark:bg-primary-dark/70 text-xs !px-2 !py-[1px]">+ New Room</PrimaryButton>
+              <MoreOption />
             </div>
             <div class="relative w-full shrink-0">
               <input type="text" v-model="search" class=" p-2 bg-background dark:bg-secondary-dark/50 w-full rounded-xl text-base" placeholder="Search...">
@@ -144,7 +147,7 @@ function updateBreakpoint() {
   </main>
 </template>
 
-<style>
+<style scoped>
 .mobile-hide {
   @apply hidden md:block;
 }
