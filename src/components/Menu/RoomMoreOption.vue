@@ -5,6 +5,8 @@ import { useAuthStore } from '../../stores/auth.store';
 import Plus from '../icons/Plus.vue';
 import Search from '../icons/Search.vue';
 
+const emits = defineEmits(['browseClick', 'newRoomClick'])
+
 const moreOptionDropdown = ref(false)
 
 function close() {
@@ -22,7 +24,7 @@ function close() {
     <Transition name="slide" >
       <ul v-if="moreOptionDropdown" class=" text-sm w-max shadow-lg transition-all origin-top top-12 duration-300 ease-in-out rounded-xl py-2 absolute right-0 bg-white dark:bg-secondary-dark font-semibold">
         <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300 ">
-          <button class=" flex gap-2 items-center p-2" >
+          <button @click="emits('browseClick')" class=" flex gap-2 items-center p-2" >
             <Search class=" w-5 h-5" />
             Browse New Room
           </button>

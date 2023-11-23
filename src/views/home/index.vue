@@ -1,5 +1,6 @@
 <script setup>
 import { useThemeStore } from "../../stores/theme.store";
+import { useRoomStore } from "../../stores/room.store";
 import { ref } from "@vue/reactivity";
 import Sun from '../../components/icons/Sun.vue';
 import Moon from '../../components/icons/Moon.vue';
@@ -8,63 +9,25 @@ import Logout from '../../components/icons/Logout.vue'
 import ChevronLeft from '../../components/icons/ChevronLeft.vue';
 import Close from '../../components/icons/Close.vue'
 import { getActiveBrekpoint } from '../../helper/tailwindBreakpoint';
-import { onMounted, onUnmounted, watch, watchEffect } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 import MoreOption from '../../components/Menu/RoomMoreOption.vue'
 import { useAuthStore } from "../../stores/auth.store";
 import ConfirmSignout from "../../components/Modal/ConfirmSignout.vue";
+import BrowseRoom from "../../components/Modal/BrowseRoom.vue";
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
-
-const arr = [
-  {
-    userId: 12
-  },
-  {
-    userId: 13
-  },
-  {
-    userId: 14
-  },
-  {
-    userId: 17
-  },
-  {
-    userId: 24
-  },
-  {
-    userId: 10
-  },
-  {
-    userId: 19
-  },
-  {
-    userId: 18
-  },
-  {
-    userId: 40
-  },
-  {
-    userId: 50
-  },
-  {
-    userId: 118
-  },
-  {
-    userId: 403
-  },
-  {
-    userId: 502
-  },
-]
+const roomStore = useRoomStore()
 
 const selectedChatUserId = ref(-1)
 const search = ref('')
 const activeBreakpoint = ref(getActiveBrekpoint())
 const logoutModal = ref(false)
+const browseModal = ref(false)
 
 onMounted(() => {
   addEventListener('resize', updateBreakpoint)
+  console.log(roomStore.joinedRooms)
 })
 
 onUnmounted(() => {
@@ -90,7 +53,10 @@ onMounted(() => {
       selectedChatUserId.value = -1
     }
   })
+
+  roomStore.getRooms()
 })
+
 </script>
 
 <template>
@@ -117,7 +83,7 @@ onMounted(() => {
           <div class="my-4 px-4">
             <div class="flex mb-3 justify-between items-center">
               <h1 class=" text-2xl font-bold ">All Rooms</h1>
-              <MoreOption />
+              <MoreOption @browseClick="browseModal = !browseModal"/>
             </div>
             <div class="relative w-full shrink-0">
               <input type="text" v-model="search" class=" p-2 bg-background dark:bg-secondary-dark/50 w-full rounded-xl text-base" placeholder="Search...">
@@ -128,11 +94,11 @@ onMounted(() => {
             </div>
           </div>
           <div class=" grow h-1  overflow-y-auto" :class="themeStore.isDarkTheme ? 'dark' : ''">
-            <div @click="() => handleRoomChange(item)" v-for="(item, index) in arr" :key="index" :class="selectedChatUserId === item.userId ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
+            <div @click="() => handleRoomChange(room.id)" v-for="(room, index) in roomStore.joinedRooms" :key="room.id" :class="selectedChatUserId === room.id ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
                 <img src="https://picsum.photos/400/300" alt="user profile picture" class=" h-12 aspect-square object-cover rounded-full shrink-0">
                 <div class=" grow text-sm flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
                   <div class=" flex align-bottom">
-                    <p class=" font-semibold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">Another User</p>
+                    <p class=" font-semibold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
                     <span class=" text-[10px] shrink-0">10/23/2077</span>
                   </div>
                   <div class="flex gap-2">
@@ -166,6 +132,7 @@ onMounted(() => {
   </main>
 
   <ConfirmSignout @toggle="(value) => logoutModal = value " :showModal="logoutModal" />
+  <BrowseRoom @toggle="(value) => browseModal = value" :showModal="browseModal" />
 </template>
 
 <style scoped>
