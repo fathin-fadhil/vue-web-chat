@@ -7,6 +7,7 @@ import Moon from '../../components/icons/Moon.vue';
 import Search from '../../components/icons/Search.vue';
 import Logout from '../../components/icons/Logout.vue'
 import ChevronLeft from '../../components/icons/ChevronLeft.vue';
+import PaperPlane from '../../components/icons/PaperPlaneSolid.vue';
 import Close from '../../components/icons/Close.vue'
 import { onMounted, watch, watchEffect } from 'vue';
 import MoreOption from '../../components/Menu/RoomMoreOption.vue'
@@ -20,36 +21,43 @@ import Primary from "../../components/Button/Primary.vue";
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
 const roomStore = useRoomStore()
-const [ parent ] = useAutoAnimate()
+const [ roomsParent ] = useAutoAnimate()
+const [ messagesParent ] = useAutoAnimate()
 
-const selectedChatUserId = ref(-1)
+const selectedChatUserId = ref('')
 const search = ref('')
 const filteredRooms = ref(roomStore.searchJoinedRoomByName(search.value))
+const newMessage = ref('')
 const logoutModal = ref(false)
 const browseModal = ref(false)
 
-function handleRoomChange(item) {
-  if (selectedChatUserId.value === -1) {
-    selectedChatUserId.value = item.userId; 
+function handleRoomChange(roomid) {
+  if (!selectedChatUserId.value) {
+    selectedChatUserId.value = roomid; 
     window.history.pushState({}, null, null)
   } else {
-    selectedChatUserId.value = item.userId; 
+    selectedChatUserId.value = roomid; 
   }
+}
+
+function handleNewMessage() {
+  roomStore.sendMessageToRoomId(selectedChatUserId.value, newMessage.value)
+  newMessage.value = ''
 }
 
 onMounted(() => {
   addEventListener('popstate', () => {
-    if (selectedChatUserId.value !== -1) {
-      selectedChatUserId.value = -1
+    if (selectedChatUserId.value) {
+      selectedChatUserId.value = ''
     }
   })
+
   if (roomStore.joinedRooms.length === 0) {
     browseModal.value = true
   }
 })
 
 watch([search, () => roomStore.joinedRooms], () => {
-  console.log('ran')
   filteredRooms.value = roomStore.searchJoinedRoomByName(search.value)
 })
 </script>
@@ -57,7 +65,7 @@ watch([search, () => roomStore.joinedRooms], () => {
 <template>
   <main class="flex flex-row w-full min-h-[100dvh]">
     <Transition name="slide-left">
-      <section v-if="!['default', 'xs', 'sm'].includes(themeStore.activeBreakpoint) || selectedChatUserId === -1" class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
+    <section v-if="['default', 'xs', 'sm'].includes(themeStore.activeBreakpoint) ? !selectedChatUserId : true " class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
         <div class=" flex gap-4 shrink-0 bg-white/40 dark:bg-white/5 px-2 py-4 rounded-xl backdrop-blur-[2px] shadow-sm z-40">
           <img src="https://picsum.photos/500" alt="user profile picture" class=" w-12 aspect-square object-cover rounded-full shrink-0">
           <div class=" grow text-sm flex flex-col justify-center">
@@ -88,7 +96,7 @@ watch([search, () => roomStore.joinedRooms], () => {
               </button>
             </div>
           </div>
-          <div ref="parent" class=" grow h-1  overflow-y-auto" :class="themeStore.isDarkTheme ? 'dark' : ''">
+          <div ref="roomsParent" class=" grow h-1  overflow-y-auto" :class="themeStore.isDarkTheme ? 'dark' : ''">
             <p v-if="filteredRooms.length === 0 && roomStore.joinedRooms.length !== 0" class=" text-center font-semibold" key="not-found">No Rooms Found</p>
             <div v-if="roomStore.joinedRooms.length === 0" class=" h-full grid place-items-center">
               <div class=" mx-auto dark:bg-teal-100/5 bg-black/5 rounded-xl p-4 w-fit">
@@ -115,17 +123,29 @@ watch([search, () => roomStore.joinedRooms], () => {
       </section>
     </Transition>
 
-    <section class=" relative grow py-4 pr-4 pl-4 md:pl-0" :class="selectedChatUserId === -1 && 'mobile-hide'">
+    <section class=" relative grow py-4 pr-4 pl-4 md:pl-0" :class="!selectedChatUserId && 'mobile-hide'">
       <Transition name="slide" mode="out-in">
-        <div v-if="selectedChatUserId !== -1" class="w-full h-full">
-          <div class=" w-full backdrop-blur-sm bg-secondary/50 dark:bg-secondary-dark/20 flex gap-2 p-4 rounded-2xl items-center">        
-            <button @click="selectedChatUserId = -1" class=" p-2 hover:bg-secondary dark:hover:bg-secondary-dark rounded-full transition-colors duration-300">
+        <div v-if="selectedChatUserId" class="w-full h-full flex flex-col gap-2">
+          <div class=" w-full backdrop-blur-sm bg-secondary/50 dark:bg-secondary-dark/20 shrink-0 flex gap-2 p-4 rounded-2xl items-center">        
+            <button @click="selectedChatUserId = ''" class=" p-2 hover:bg-secondary dark:hover:bg-secondary-dark rounded-full transition-colors duration-300">
               <ChevronLeft class=" w-6 aspect-square" />
             </button>
             <img src="https://picsum.photos/400/300" alt="user profile picture" class=" w-10 aspect-square object-cover rounded-full shrink-0">
             <p class=" font-bold h-fit grow text-batext-base">Another User</p>
           </div>
-          {{ selectedChatUserId === -1 ? 'no chat' : selectedChatUserId }}
+          <div ref="messagesParent" class=" h-1 overflow-auto grow flex flex-col gap-4">
+            <div class="" v-for="(messageData, index) in roomStore.messagesByRoomId[selectedChatUserId]" :key="messageData.id">
+              {{ messageData }}
+            </div>
+          </div>
+          <form @submit.prevent="handleNewMessage()" class=" shrink-0 flex gap-3">
+            <div class=" grow">
+              <input v-model="newMessage" id="message_input" type="text" class=" p-2 bg-white focus:ring-1 ring-teal-500/50 dark:bg-secondary-dark/50 w-full rounded-xl text-base" placeholder="Message">
+            </div>
+            <Primary type="submit" class=" shrink-0 !rounded-full !p-2 w-10 h-10 flex justify-center items-center">
+              <PaperPlane class=" w-5 h-5 text-white" />
+            </Primary>
+          </form>
         </div>
         <div v-else  class=" bg-red-500 h-full hidden md:block">
           background

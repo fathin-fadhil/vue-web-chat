@@ -6,7 +6,7 @@ import { useRoomStore } from './room.store';
 
 export const useAuthStore = defineStore('auth', () => {
     const roomStore = useRoomStore()
-    const username = ref(localStorage.getItem('username'))
+    const username = ref(localStorage.getItem('username') || '')
 
     function login(usernameInfo) {
         username.value = usernameInfo;
