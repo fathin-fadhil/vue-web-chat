@@ -111,16 +111,14 @@ watch([search, () => roomStore.joinedRooms], () => {
               <div class=" grow text-sm min-h-[69px] flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
                 <div class=" flex align-bottom">
                   <p class=" font-semibold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
-                  <span class=" text-xs shrink-0">
-                    {{ 
-                      roomStore.messagesByRoomId[room.id]?.length > 0 
-                        ? formatTimeString(roomStore.messagesByRoomId[room.id][roomStore.messagesByRoomId[room.id]?.length - 1]?.createdAt) 
-                        : ''
-                    }}
+                  <span v-if="room.messages.length > 0" class=" text-xs shrink-0">
+                    {{ formatTimeString(room.messages.at(-1)?.createdAt) }}
                   </span>
                 </div>
-                <div class="flex gap-2">
-                  <p class="grow text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden ">{{ roomStore.messagesByRoomId[room.id][roomStore.messagesByRoomId[room.id].length - 1]?.message }}</p>
+                <div v-if="room.messages.length > 0" class="flex gap-2">
+                  <p class="grow text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden ">
+                    {{ room.messages.at(-1)?.message }}
+                  </p>
                   <span v-if="Math.random() > 0.5" class=" shrink-0 text-xs grid place-content-center  w-3 h-3 ml-auto rounded-full bg-primary dark:bg-primary-dark"></span>
                 </div>
               </div>
@@ -141,11 +139,11 @@ watch([search, () => roomStore.joinedRooms], () => {
             <p class=" font-bold h-fit grow text-batext-base">{{ selectedRoomObject.name }}</p>
           </div>
           <div ref="messagesParent" class=" h-1 overflow-auto grow flex flex-col gap-4">
-            <div class="" v-for="(messageData, index) in roomStore.messagesByRoomId[selectedRoomObject?.id]" :key="messageData.id">
+            <div class="" v-for="(messageData) in selectedRoomObject.messages" :key="messageData.id">
               {{ messageData }}
             </div>
           </div>
-          <form @submit.prevent="handleNewMessage()" class=" shrink-0 flex gap-3">
+          <form autocomplete="off" @submit.prevent="handleNewMessage()" class=" shrink-0 flex gap-3">
             <div class=" grow">
               <input v-model="newMessage" id="message_input" type="text" class=" p-2 bg-white focus:ring-1 ring-teal-500/50 dark:bg-secondary-dark/90 w-full rounded-xl text-base" placeholder="Message">
             </div>

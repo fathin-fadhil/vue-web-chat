@@ -9,7 +9,6 @@ export const useRoomStore = defineStore('room', () => {
 
   const rooms = ref(JSON.parse(localStorage.getItem('rooms')) || [])
   const joinedRooms = ref(JSON.parse(localStorage.getItem('joinedRooms')) || [])
-  const messagesByRoomId = ref(JSON.parse(localStorage.getItem('messagesByRoomId')) || {})
 
   async function getRooms() {
     try {
@@ -30,17 +29,18 @@ export const useRoomStore = defineStore('room', () => {
   }
 
   async function joinRoom(roomId) {
-    const roomToBeAdded = rooms.value.find(room => room.id === roomId)
-    joinedRooms.value = [...joinedRooms.value, roomToBeAdded]
-    localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
-    await updateMessagesByRoomId(roomId)
+    try {
+      const res = await axiosApiClient.get(`/api/v1/room/${roomId}`)
+      joinedRooms.value = [...joinedRooms.value, res.data.data]
+      localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
+    } catch (error) {
+      console.log("🚀 ~ file: room.store.js:48 ~ joinRoom ~ error:", error)      
+    }
   }
 
   function exitRoom(roomId) {
     joinedRooms.value = joinedRooms.value.filter(room => room.id !== roomId)
     localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
-    delete messagesByRoomId.value[roomId]
-    localStorage.setItem('messagesByRoomId', JSON.stringify(messagesByRoomId.value))
   }
 
   function checkAlreadyInRoom(roomId) {
@@ -69,12 +69,13 @@ export const useRoomStore = defineStore('room', () => {
   async function updateMessagesByRoomId(roomId) {
     try {
       const res = await axiosApiClient.get(`api/v1/room/${roomId}`)
-      messagesByRoomId.value[roomId] = res.data.data.messages
-      localStorage.setItem('messagesByRoomId', JSON.stringify(messagesByRoomId.value))
+      const indexOfRoom = joinedRooms.value.findIndex(room => room.id === roomId)
+      joinedRooms.value[indexOfRoom]['messages'] = res.data.data.messages
+      localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
     } catch (error) {
       console.log("🚀 ~ file: room.store.js:39 ~ joinRoom ~ error:", error)
     }
   }
 
-  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, messagesByRoomId }
+  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState }
 })
