@@ -52,7 +52,7 @@ function handleJoin(roomId) {
   <transition name="pop" appear>
     <div v-if="showModal" class="modal px-4 max-w-lg w-full h-[90dvh]">
       <div class="flex flex-col overflow-auto backdrop-blur-lg h-full bg-white/80 dark:bg-[rgb(6,14,8)]/90 rounded-2xl" role="dialog" >
-        <section class=" grow px-8 py-6 flex flex-col justify-start gap-2">
+        <section class=" grow px-8 pt-6 pb-1 flex flex-col justify-start gap-2">
           <h1 class=" font-bold text-2xl shrink-0 mb-2">Browse Rooms</h1>
           <div class="relative w-full shrink-0">
             <input type="text" v-model="search" class=" p-2 bg-white/60 dark:bg-[rgb(15,23,17)]/70 focus:ring-1 ring-teal-500/50 w-full rounded-xl text-base" placeholder="Search...">
@@ -83,8 +83,7 @@ function handleJoin(roomId) {
           </div>
         </section>
         <section class=" shrink-0 flex border-t-[1px] border-accent/40 text-sm">
-          <button @click="toggleShow(false)" class=" text-blue-500 transition-colors duration-300 hover:bg-black/20 grow border-r-[1px] font-semibold p-4 border-accent/40">Cancel</button>
-          <button @click="authStore.logout" class=" grow p-4 hover:bg-black/20 text-red-500 font-semibold transition-colors duration-300">Logout</button>
+          <button @click="toggleShow(false)" class=" text-blue-500 transition-colors duration-300 hover:bg-black/20 grow font-semibold p-4 border-accent/40">Cancel</button>
         </section>
       </div>
     </div>

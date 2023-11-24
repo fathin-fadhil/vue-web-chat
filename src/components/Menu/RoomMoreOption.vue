@@ -26,7 +26,7 @@ function close() {
         <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300">
           <button @click="emits('browseClick')" class=" flex gap-2 items-center py-2 px-4" >
             <Search class=" w-5 h-5" />
-            Browse New Room
+            Browse Room
           </button>
         </li>
         <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300">
