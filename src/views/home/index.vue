@@ -24,31 +24,31 @@ const roomStore = useRoomStore()
 const [ roomsParent ] = useAutoAnimate()
 const [ messagesParent ] = useAutoAnimate()
 
-const selectedChatUserId = ref('')
+const selectedRoomObject = ref(null)
 const search = ref('')
 const filteredRooms = ref(roomStore.searchJoinedRoomByName(search.value))
 const newMessage = ref('')
 const logoutModal = ref(false)
 const browseModal = ref(false)
 
-function handleRoomChange(roomid) {
-  if (!selectedChatUserId.value) {
-    selectedChatUserId.value = roomid; 
+function handleRoomChange(roomObject) {
+  if (!selectedRoomObject.value) {
+    selectedRoomObject.value = roomObject; 
     window.history.pushState({}, null, null)
   } else {
-    selectedChatUserId.value = roomid; 
+    selectedRoomObject.value = roomObject; 
   }
 }
 
 function handleNewMessage() {
-  roomStore.sendMessageToRoomId(selectedChatUserId.value, newMessage.value)
+  roomStore.sendMessageToRoomId(selectedRoomObject.value.id, newMessage.value)
   newMessage.value = ''
 }
 
 onMounted(() => {
   addEventListener('popstate', () => {
-    if (selectedChatUserId.value) {
-      selectedChatUserId.value = ''
+    if (selectedRoomObject.value) {
+      selectedRoomObject.value = ''
     }
   })
 
@@ -65,7 +65,7 @@ watch([search, () => roomStore.joinedRooms], () => {
 <template>
   <main class="flex flex-row w-full min-h-[100dvh]">
     <Transition name="slide-left">
-    <section v-if="['default', 'xs', 'sm'].includes(themeStore.activeBreakpoint) ? !selectedChatUserId : true " class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
+    <section v-if="['default', 'xs', 'sm'].includes(themeStore.activeBreakpoint) ? !selectedRoomObject : true " class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
         <div class=" flex gap-4 shrink-0 bg-white/40 dark:bg-white/5 px-2 py-4 rounded-xl backdrop-blur-[2px] shadow-sm z-40">
           <img src="https://picsum.photos/500" alt="user profile picture" class=" w-12 aspect-square object-cover rounded-full shrink-0">
           <div class=" grow text-sm flex flex-col justify-center">
@@ -105,7 +105,7 @@ watch([search, () => roomStore.joinedRooms], () => {
                 <Primary @click="browseModal = true" class=" !mx-auto mt-2 !px-3 text-sm !block">Browse Room</Primary>         
               </div>            
             </div>
-            <div @click="() => handleRoomChange(room.id)" v-for="(room, index) in filteredRooms" :key="room.id" :class="selectedChatUserId === room.id ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
+            <div @click="() => handleRoomChange(room)" v-for="(room, index) in filteredRooms" :key="room.id" :class="selectedRoomObject?.id === room.id ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
               <img src="https://picsum.photos/400/300" alt="user profile picture" class=" h-12 aspect-square object-cover rounded-full shrink-0">
               <div class=" grow text-sm flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
                 <div class=" flex align-bottom">
@@ -123,24 +123,24 @@ watch([search, () => roomStore.joinedRooms], () => {
       </section>
     </Transition>
 
-    <section class=" relative grow py-4 pr-4 pl-4 md:pl-0" :class="!selectedChatUserId && 'mobile-hide'">
+    <section class=" relative grow py-4 pr-4 pl-4 md:pl-0" :class="!selectedRoomObject && 'mobile-hide'">
       <Transition name="slide" mode="out-in">
-        <div v-if="selectedChatUserId" class="w-full h-full flex flex-col gap-2">
+        <div v-if="selectedRoomObject" class="w-full h-full flex flex-col gap-2">
           <div class=" w-full backdrop-blur-sm bg-secondary/50 dark:bg-secondary-dark/20 shrink-0 flex gap-2 p-4 rounded-2xl items-center">        
-            <button @click="selectedChatUserId = ''" class=" p-2 hover:bg-secondary dark:hover:bg-secondary-dark rounded-full transition-colors duration-300">
+            <button @click="selectedRoomObject = ''" class=" p-2 hover:bg-secondary dark:hover:bg-secondary-dark rounded-full transition-colors duration-300">
               <ChevronLeft class=" w-6 aspect-square" />
             </button>
             <img src="https://picsum.photos/400/300" alt="user profile picture" class=" w-10 aspect-square object-cover rounded-full shrink-0">
-            <p class=" font-bold h-fit grow text-batext-base">Another User</p>
+            <p class=" font-bold h-fit grow text-batext-base">{{ selectedRoomObject.name }}</p>
           </div>
           <div ref="messagesParent" class=" h-1 overflow-auto grow flex flex-col gap-4">
-            <div class="" v-for="(messageData, index) in roomStore.messagesByRoomId[selectedChatUserId]" :key="messageData.id">
+            <div class="" v-for="(messageData, index) in roomStore.messagesByRoomId[selectedRoomObject?.id]" :key="messageData.id">
               {{ messageData }}
             </div>
           </div>
           <form @submit.prevent="handleNewMessage()" class=" shrink-0 flex gap-3">
             <div class=" grow">
-              <input v-model="newMessage" id="message_input" type="text" class=" p-2 bg-white focus:ring-1 ring-teal-500/50 dark:bg-secondary-dark/50 w-full rounded-xl text-base" placeholder="Message">
+              <input v-model="newMessage" id="message_input" type="text" class=" p-2 bg-white focus:ring-1 ring-teal-500/50 dark:bg-secondary-dark/90 w-full rounded-xl text-base" placeholder="Message">
             </div>
             <Primary type="submit" class=" shrink-0 !rounded-full !p-2 w-10 h-10 flex justify-center items-center">
               <PaperPlane class=" w-5 h-5 text-white" />
