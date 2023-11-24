@@ -3,6 +3,8 @@ import { useAutoAnimate } from '@formkit/auto-animate/vue';
 import { getInitials } from '../../helper/userHelper';
 import { useAuthStore } from '../../stores/auth.store';
 import { getTimeString } from "../../helper/timeFormatter";
+import { onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
+import ChevronLeft from '../icons/ChevronLeft.vue';
 
 const [ messagesParent ] = useAutoAnimate()
 const authStore = useAuthStore()
@@ -14,10 +16,31 @@ const props = defineProps({
   }
 })
 
+const scrollBottomPos = ref(0)
+
+watch(() => props.messagesData, scrollToBottom, { flush: 'post' })
+
+onMounted(() => {
+  scrollToBottom()
+  messagesParent.value?.addEventListener('scroll', updateScrollPos)
+})
+
+onUnmounted(() => {
+  messagesParent.value?.removeEventListener('scroll', updateScrollPos)
+})
+
+function scrollToBottom() {
+  messagesParent.value.scrollTop = messagesParent.value.scrollHeight
+}
+
+function updateScrollPos(ev) {
+  scrollBottomPos.value = ev.target.scrollTop + messagesParent?.value?.clientHeight
+}
+
 </script>
 
 <template>
-  <div ref="messagesParent" class=" h-full overflow-y-auto overflow-x-hidden flex flex-col">
+  <div id="chat_container" ref="messagesParent" class=" h-full overflow-y-auto scroll-smooth overflow-x-hidden flex flex-col relative">
     <div :class="[messagesData[index + 1]?.user_name === messageData.user_name ? 'mb-1' : 'mb-4']" v-for="(messageData, index) in messagesData" :key="messageData.id">
       <span class=" text-xs font-bold" :class="messageData.user_name !== authStore.username ? 'pl-14' : ' text-right w-full block pr-4'" v-if="getTimeString(messageData.createdAt) !== getTimeString(messagesData[index - 1]?.createdAt)">
         {{ messageData.user_name === authStore.username ? '' : messageData.user_name + '  • ' }} {{ getTimeString(messageData.createdAt) }}
@@ -36,6 +59,9 @@ const props = defineProps({
       </div>
     </div>
   </div>
+  <button @click="scrollToBottom" :class="scrollBottomPos < messagesParent?.scrollHeight -50 ? 'opacity-100 z-0' : 'opacity-0 -z-50'" class=" fixed grid transition-opacity duration-300 right-4 place-items-center bottom-24 rounded-full w-10 h-10 bg-accent/80">
+    <ChevronLeft class=" h-7 w-7 -rotate-90 text-white"  />
+  </button>
 </template>
 
 <style scoped>
