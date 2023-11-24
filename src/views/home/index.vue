@@ -18,12 +18,12 @@ import { useAutoAnimate } from "@formkit/auto-animate/vue";
 import UsersChat from "../../components/icons/UsersChat.vue";
 import Primary from "../../components/Button/Primary.vue";
 import { formatTimeString } from '../../helper/timeFormatter'
+import ChatView from '../../components/Home/ChatView.vue'
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
 const roomStore = useRoomStore()
 const [ roomsParent ] = useAutoAnimate()
-const [ messagesParent ] = useAutoAnimate()
 
 const selectedRoomObject = ref(null)
 const search = ref('')
@@ -128,7 +128,7 @@ watch([search, () => roomStore.joinedRooms], () => {
       </section>
     </Transition>
 
-    <section class=" relative grow py-4 pr-4 pl-4 md:pl-0" :class="!selectedRoomObject && 'mobile-hide'">
+    <section class=" relative grow py-4 pr-4 pl-4 h-[100dvh] md:pl-0" :class="!selectedRoomObject && 'mobile-hide'">
       <Transition name="slide" mode="out-in">
         <div v-if="selectedRoomObject" class="w-full h-full flex flex-col gap-2">
           <div class=" w-full backdrop-blur-sm bg-secondary/50 dark:bg-secondary-dark/20 shrink-0 flex gap-2 p-4 rounded-2xl items-center">        
@@ -138,10 +138,8 @@ watch([search, () => roomStore.joinedRooms], () => {
             <img src="https://picsum.photos/400/300" alt="user profile picture" class=" w-10 aspect-square object-cover rounded-full shrink-0">
             <p class=" font-bold h-fit grow text-batext-base">{{ selectedRoomObject.name }}</p>
           </div>
-          <div ref="messagesParent" class=" h-1 overflow-auto grow flex flex-col gap-4">
-            <div class="" v-for="(messageData) in selectedRoomObject.messages" :key="messageData.id">
-              {{ messageData }}
-            </div>
+          <div class=" h-1 grow ">
+            <ChatView :messagesData="selectedRoomObject.messages" />
           </div>
           <form autocomplete="off" @submit.prevent="handleNewMessage()" class=" shrink-0 flex gap-3">
             <div class=" grow">

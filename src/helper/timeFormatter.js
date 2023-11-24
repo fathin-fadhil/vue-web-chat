@@ -29,3 +29,10 @@ export function formatTimeString(timeString) {
     return `${day}/${month}/${year}`;
   }
 }
+
+export function getTimeString(timeString) {
+  const inputDate = new Date(timeString);
+  const hours = inputDate.getHours().toString().padStart(2, '0');
+  const minutes = inputDate.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
