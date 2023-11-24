@@ -14,6 +14,8 @@ import { useAuthStore } from "../../stores/auth.store";
 import ConfirmSignout from "../../components/Modal/ConfirmSignout.vue";
 import BrowseRoom from "../../components/Modal/BrowseRoom.vue";
 import { useAutoAnimate } from "@formkit/auto-animate/vue";
+import UsersChat from "../../components/icons/UsersChat.vue";
+import Primary from "../../components/Button/Primary.vue";
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
@@ -87,7 +89,14 @@ watch([search, () => roomStore.joinedRooms], () => {
             </div>
           </div>
           <div ref="parent" class=" grow h-1  overflow-y-auto" :class="themeStore.isDarkTheme ? 'dark' : ''">
-            <p v-if="filteredRooms.length === 0" class=" text-center font-semibold" key="not-found">No Rooms Found</p>
+            <p v-if="filteredRooms.length === 0 && roomStore.joinedRooms.length !== 0" class=" text-center font-semibold" key="not-found">No Rooms Found</p>
+            <div v-if="roomStore.joinedRooms.length === 0" class=" h-full grid place-items-center">
+              <div class=" mx-auto dark:bg-teal-100/5 bg-black/5 rounded-xl p-4 w-fit">
+                <UsersChat class=" mx-auto w-20 h-20" />
+                <p class=" font-semibold">You Haven't Join Any Room</p>
+                <Primary @click="browseModal = true" class=" !mx-auto mt-2 !px-3 text-sm !block">Browse Room</Primary>         
+              </div>            
+            </div>
             <div @click="() => handleRoomChange(room.id)" v-for="(room, index) in filteredRooms" :key="room.id" :class="selectedChatUserId === room.id ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
               <img src="https://picsum.photos/400/300" alt="user profile picture" class=" h-12 aspect-square object-cover rounded-full shrink-0">
               <div class=" grow text-sm flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
