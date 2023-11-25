@@ -37,26 +37,38 @@ function updateScrollPos(ev) {
   scrollBottomPos.value = ev.target.scrollTop + messagesParent?.value?.clientHeight
 }
 
+function isTheSameSenderOrDifferentDate(currentMessageObject, messageIndex, fromPreviousMessage = true) {
+  const indexShift = fromPreviousMessage ? -1 : 1
+  const messageDataToBeCompared = props?.messagesData[messageIndex + indexShift]
+  if (fromPreviousMessage && formatChatDateString(currentMessageObject.createdAt) !== formatChatDateString(messageDataToBeCompared?.createdAt)) {
+    return false
+  }
+  return messageDataToBeCompared?.user_name === currentMessageObject.user_name    
+}
+
+function isSenderCurrentUser(currentMessageObject) {
+  return currentMessageObject.user_name === authStore.username
+}
 </script>
 
 <template>
   <div id="chat_container" ref="messagesParent" class=" h-full overflow-y-auto scroll-smooth overflow-x-hidden flex flex-col relative">
-    <div :class="[messagesData[index + 1]?.user_name === messageData.user_name ? 'mb-1' : 'mb-4']" v-for="(messageData, index) in messagesData" :key="messageData.id">
+    <div :class="isTheSameSenderOrDifferentDate(messageData, index, false) ? 'mb-1' : 'mb-4'" v-for="(messageData, index) in messagesData" :key="messageData.id">
       <div v-if="formatChatDateString(messageData.createdAt) !== formatChatDateString(messagesData[index - 1]?.createdAt)" class=" w-fit text-white text-sm mx-auto font-bold rounded-xl py-2 px-4 bg-primary">
         {{ formatChatDateString(messageData.createdAt) }}
       </div>
-      <span class=" text-xs font-bold" :class="messageData.user_name !== authStore.username ? 'pl-14' : ' text-right w-full block pr-4'" v-if="getTimeString(messageData.createdAt) !== getTimeString(messagesData[index - 1]?.createdAt)">
-        {{ messageData.user_name === authStore.username ? '' : messageData.user_name + '  • ' }} {{ getTimeString(messageData.createdAt) }}
+      <span class=" text-xs font-bold" :class="isSenderCurrentUser(messageData) ? ' text-right w-full block pr-4' : 'pl-14'" v-if="getTimeString(messageData.createdAt) !== getTimeString(messagesData[index - 1]?.createdAt)">
+        {{ isSenderCurrentUser(messageData) ? '' : messageData.user_name + '  • ' }} {{ getTimeString(messageData.createdAt) }}
       </span>
       <div class="flex gap-1">
-        <span v-if="messageData.user_name !== authStore.username" class=" w-9 h-9 font-bold shrink-0 rounded-full dark:bg-accent-dark text-text-dark bg-accent flex justify-center items-center" :class="messagesData[index - 1]?.user_name === messageData.user_name ? 'opacity-0' : ''">
+        <span v-if="!isSenderCurrentUser(messageData)" class=" w-9 h-9 font-bold shrink-0 rounded-full dark:bg-accent-dark text-text-dark bg-accent flex justify-center items-center" :class="isTheSameSenderOrDifferentDate(messageData, index) ? 'opacity-0' : ''">
           {{ getInitials(messageData.user_name) }}
         </span>
         <div class=" w-full text-sm font-medium relative" :class="messageData.user_name === authStore.username ? 'mr-3 flex justify-end' : 'ml-3'">
-          <p class=" p-2 rounded-xl w-fit max-w-[75%] md:max-w-[68%] lg:max-w-[63%] xl:max-w-[56%] " :class="messageData.user_name === authStore.username ? 'bg-secondary dark:bg-primary ' : 'bg-white dark:bg-secondary-dark'">
+          <p class=" p-2 rounded-xl w-fit max-w-[75%] md:max-w-[68%] lg:max-w-[63%] xl:max-w-[56%] " :class="isSenderCurrentUser(messageData) ? 'bg-secondary dark:bg-primary ' : 'bg-white dark:bg-secondary-dark'">
             {{ messageData.message }}
           </p>
-          <div v-if="messagesData[index - 1]?.user_name !== messageData.user_name" :class="messageData.user_name === authStore.username ? 'bubble-arrow right' : 'bubble-arrow'"></div>
+          <div v-if="!isTheSameSenderOrDifferentDate(messageData, index)" :class="isSenderCurrentUser(messageData) ? 'bubble-arrow right' : 'bubble-arrow'"></div>
         </div>        
       </div>
     </div>
