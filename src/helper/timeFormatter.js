@@ -36,3 +36,29 @@ export function getTimeString(timeString) {
   const minutes = inputDate.getMinutes().toString().padStart(2, '0');
   return `${hours}:${minutes}`;
 }
+
+export function formatChatDateString(dateString) {
+  const now = new Date();
+  const date = new Date(dateString);
+
+  // Check if the date is today
+  if (
+    now.getUTCFullYear() === date.getUTCFullYear() &&
+    now.getUTCMonth() === date.getUTCMonth() &&
+    now.getUTCDate() === date.getUTCDate()
+  ) {
+    return "Today";
+  }
+
+  // Check if the date is more than 1 week ago
+  const oneWeekAgo = new Date(now);
+  oneWeekAgo.setUTCDate(oneWeekAgo.getUTCDate() - 7);
+  if (date < oneWeekAgo) {
+    const formattedDate = `${date.getUTCDate()}/${date.getUTCMonth() + 1}/${date.getUTCFullYear()}`;
+    return formattedDate;
+  }
+
+  // Return the day of the week
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  return daysOfWeek[date.getUTCDay()];
+}

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "@vue/reactivity";
 import useAxiosApiClient from "../helper/useAxiosApiClient";
 import { useAuthStore } from "./auth.store";
+import { onMounted } from "vue";
 
 export const useRoomStore = defineStore('room', () => {
   const axiosApiClient = useAxiosApiClient()
@@ -9,6 +10,12 @@ export const useRoomStore = defineStore('room', () => {
 
   const rooms = ref(JSON.parse(localStorage.getItem('rooms')) || [])
   const joinedRooms = ref(JSON.parse(localStorage.getItem('joinedRooms')) || [])
+
+  async function updateAllJoinedRoomMessages() {
+    joinedRooms.value.forEach(async (room) => {
+      await updateMessagesByRoomId(room.id)
+    })
+  }
 
   async function getRooms() {
     try {
@@ -77,5 +84,5 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
-  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState }
+  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages }
 })

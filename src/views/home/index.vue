@@ -56,6 +56,8 @@ onMounted(() => {
   if (roomStore.joinedRooms?.length === 0) {
     browseModal.value = true
   }
+
+  roomStore.updateAllJoinedRoomMessages()
 })
 
 watch([search, () => roomStore.joinedRooms], () => {
