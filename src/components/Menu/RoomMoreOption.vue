@@ -12,7 +12,7 @@ const moreOptionDropdown = ref(false)
 function close() {
  setTimeout(() => {
   moreOptionDropdown.value = false;
- }, 300); 
+ }, 200); 
 }
 </script>
 

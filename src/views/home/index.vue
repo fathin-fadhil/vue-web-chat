@@ -12,7 +12,7 @@ import Close from '../../components/icons/Close.vue'
 import { onMounted, watch, watchEffect } from 'vue';
 import MoreOption from '../../components/Menu/RoomMoreOption.vue'
 import { useAuthStore } from "../../stores/auth.store";
-import ConfirmSignout from "../../components/Modal/ConfirmSignout.vue";
+import ConfirmModal from "../../components/Modal/ConfirmModal.vue";
 import BrowseRoom from "../../components/Modal/BrowseRoom.vue";
 import { useAutoAnimate } from "@formkit/auto-animate/vue";
 import UsersChat from "../../components/icons/UsersChat.vue";
@@ -33,6 +33,7 @@ const newMessage = ref('')
 const logoutModal = ref(false)
 const showTime = ref(false)
 const browseModal = ref(false)
+const exitRoomModal = ref(false)
 
 function handleRoomChange(roomObject) {
   if (!selectedRoomObject.value) {
@@ -141,7 +142,7 @@ watch([search, () => roomStore.joinedRooms], () => {
             </button>
             <img src="https://picsum.photos/400/300" alt="user profile picture" class=" w-10 aspect-square object-cover rounded-full shrink-0">
             <p class=" font-bold h-fit grow text-batext-base">{{ selectedRoomObject.name }}</p>
-            <ChatMoreOption @timeToggleClick="() => showTime = !showTime" />
+            <ChatMoreOption @timeToggleClick="() => showTime = !showTime" @exitRoomClick="() => exitRoomModal = true" :showTime="showTime" />
           </div>
           <div class=" h-1 grow z-0">
             <ChatView :showTime="showTime" :messagesData="selectedRoomObject.messages" />
@@ -162,8 +163,9 @@ watch([search, () => roomStore.joinedRooms], () => {
     </section>
   </main>
 
-  <ConfirmSignout @toggle="(value) => logoutModal = value " :showModal="logoutModal" />
+  <ConfirmModal @confirmClick="authStore.logout" @toggle="(value) => logoutModal = value " :showModal="logoutModal" title="Logout" body="Are you sure?" confirmText="Logout" />
   <BrowseRoom @toggle="(value) => browseModal = value" :showModal="browseModal" />
+  <ConfirmModal @confirmClick="() => {roomStore.exitRoom(selectedRoomObject.id); selectedRoomObject = null; exitRoomModal = false}"  @toggle="(value) => exitRoomModal = value" :showModal="exitRoomModal" title="Exit" body="Exit from this room?" confirmText="Exit" />
 </template>
 
 <style scoped>

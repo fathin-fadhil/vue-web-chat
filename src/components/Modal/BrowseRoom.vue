@@ -85,7 +85,7 @@ function handleJoin(roomId) {
           </div>
         </section>
         <section class=" shrink-0 flex border-t-[1px] border-accent/40 text-sm">
-          <button @click="toggleShow(false)" class=" text-blue-500 transition-colors duration-300 hover:bg-black/20 grow font-semibold p-4 border-accent/40">Cancel</button>
+          <button @click="toggleShow(false)" class=" text-blue-500 transition-colors duration-300 hover:bg-black/20 grow font-semibold p-4 border-accent/40">Done</button>
         </section>
       </div>
     </div>
@@ -123,7 +123,7 @@ function handleJoin(roomId) {
   left: 0;
   background-color: rgba(0, 0, 0, 0.18);
   z-index: 998;
-  /* backdrop-filter: blur(5px); */
+  backdrop-filter: blur(5px);
   cursor: pointer;
 }
 

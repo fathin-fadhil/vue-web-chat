@@ -6,9 +6,21 @@ defineProps({
     type: Boolean,
     required: true,
   },
+  title: {
+    type: String,
+    required: true
+  },
+  body: {
+    type: String,
+    required: true
+  },
+  confirmText: {
+    type: String,
+    required: true
+  }
 });
 
-const emits = defineEmits(["toggle"]);
+const emits = defineEmits(["toggle", "confirmClick"]);
 const authStore = useAuthStore()
 
 function toggleShow(value) {
@@ -23,14 +35,13 @@ function toggleShow(value) {
   <transition name="pop" appear>
     <div class="modal w-fit overflow-hidden max-w-lg bg-white/90 dark:bg-zinc-700/90 rounded-2xl h-fit" role="dialog" v-if="showModal">
       <div class=" px-24 py-6 flex flex-col justify-start gap-2">
-        <h1 class=" font-bold text-center text-lg">Logout</h1>
-        <p class=" text-sm">Are you sure?</p>
+        <h1 class=" font-bold text-center text-lg">{{ title }}</h1>
+        <p class=" text-sm">{{ body }}</p>
       </div>
-      <div class=" flex border-t-[1px] border-accent/40 text-sm">
-        <button @click="toggleShow(false)" class=" text-blue-500 transition-colors duration-300 hover:bg-black/20 grow border-r-[1px] font-semibold p-4 border-accent/40">Cancel</button>
-        <button @click="authStore.logout" class=" grow p-4 hover:bg-black/20 text-red-500 font-semibold transition-colors duration-300">Logout</button>
+      <div class=" flex border-t-[1px] border-accent/40 text-sm ">
+        <button @click="toggleShow(false)" class=" text-blue-500 grow transition-colors duration-300 hover:bg-black/20  border-r-[1px] font-semibold py-4 w-1 border-accent/40">Cancel</button>
+        <button @click="emits('confirmClick')" class=" grow py-4 hover:bg-black/20 text-red-500 font-semibold transition-colors duration-300 w-1">{{ confirmText }}</button>
       </div>
-      <!-- <button @click="toggleShow(false)" class="button">Hide Modal</button> -->
     </div>
   </transition>
 </template>

@@ -8,7 +8,14 @@ import Search from '../icons/Search.vue';
 import Clock from '../icons/Clock.vue';
 import Logout from '../icons/Logout.vue';
 
-const emits = defineEmits(['timeToggleClick', 'exitRoomCLick'])
+const emits = defineEmits(['timeToggleClick', 'exitRoomClick'])
+
+const props = defineProps({
+  showTime: {
+    type: Boolean,
+    required: true
+  }
+})
 
 const moreOptionDropdown = ref(false)
 
@@ -29,11 +36,11 @@ function close() {
         <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300">
           <button @click="emits('timeToggleClick')" class="  flex gap-2 items-center py-2 px-4" >
             <Clock class=" w-5 h-5" />
-            Toggle Time
+            {{ showTime ? 'Hide Time' : 'Show Time' }}
           </button>
         </li>
-        <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300">
-          <button @click="emits('exitRoomCLick')" class=" flex gap-2 items-center py-2 px-4" >
+        <li class=" dark:hover:bg-red-500/10 hover:bg-red-500/40 hover:text-red-500 transition-colors duration-300">
+          <button @click="emits('exitRoomClick')" class=" flex gap-2 items-center py-2 px-4" >
             <Logout class="h-6 w-6" />
             Exit Room
           </button>
