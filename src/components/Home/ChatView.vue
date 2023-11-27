@@ -18,11 +18,19 @@ const props = defineProps({
 
 const scrollBottomPos = ref(0)
 
-watch(() => props.messagesData, scrollToBottom, { flush: 'post' })
+watch(() => props.messagesData, () => {
+  scrollToBottom()
+  messagesParent.value.classList.add('scroll-smooth')
+}, { flush: 'post' })
+
+watch(() => props.messagesData, () => {
+  messagesParent.value.classList.remove('scroll-smooth')
+}, {flush: 'pre'})
 
 onMounted(() => {
   scrollToBottom()
   messagesParent.value?.addEventListener('scroll', updateScrollPos)
+  messagesParent.value.classList.add('scroll-smooth')
 })
 
 onUnmounted(() => {
@@ -52,21 +60,24 @@ function isSenderCurrentUser(currentMessageObject) {
 </script>
 
 <template>
-  <div id="chat_container" ref="messagesParent" class=" h-full overflow-y-auto scroll-smooth overflow-x-hidden flex flex-col relative">
+  <div id="chat_container" ref="messagesParent" class=" h-full overflow-y-auto   overflow-x-hidden flex flex-col relative">
     <div :class="isTheSameSenderOrDifferentDate(messageData, index, false) ? 'mb-1' : 'mb-4'" v-for="(messageData, index) in messagesData" :key="messageData.id">
-      <div v-if="formatChatDateString(messageData.createdAt) !== formatChatDateString(messagesData[index - 1]?.createdAt)" class=" w-fit text-white text-sm mx-auto font-bold rounded-xl py-2 px-4 bg-primary">
-        {{ formatChatDateString(messageData.createdAt) }}
+      <div v-if="formatChatDateString(messageData.createdAt) !== formatChatDateString(messagesData[index - 1]?.createdAt)" class=" w-fit text-primary dark:text-primary-dark text-xs mx-auto font-black rounded-xl py- px-4 "> 
+        {{ formatChatDateString(messageData.createdAt) }} • {{ getTimeString(messageData.createdAt) }} 
       </div>
-      <span class=" text-xs font-bold" :class="isSenderCurrentUser(messageData) ? ' text-right w-full block pr-4' : 'pl-14'" v-if="getTimeString(messageData.createdAt) !== getTimeString(messagesData[index - 1]?.createdAt)">
-        {{ isSenderCurrentUser(messageData) ? '' : messageData.user_name + '  • ' }} {{ getTimeString(messageData.createdAt) }}
+      <span class=" text-xs font-bold" :class="isSenderCurrentUser(messageData) ? ' text-right w-full block pr-4' : 'pl-14'" v-if="!isTheSameSenderOrDifferentDate(messageData, index)">
+        {{ isSenderCurrentUser(messageData) ? '' : messageData.user_name  }}
       </span>
       <div class="flex gap-1">
         <span v-if="!isSenderCurrentUser(messageData)" class=" w-9 h-9 font-bold shrink-0 rounded-full dark:bg-accent-dark text-text-dark bg-accent flex justify-center items-center" :class="isTheSameSenderOrDifferentDate(messageData, index) ? 'opacity-0' : ''">
           {{ getInitials(messageData.user_name) }}
         </span>
-        <div class=" w-full text-sm font-medium relative" :class="messageData.user_name === authStore.username ? 'mr-3 flex justify-end' : 'ml-3'">
-          <p class=" p-2 rounded-xl w-fit max-w-[75%] md:max-w-[68%] lg:max-w-[63%] xl:max-w-[56%] " :class="isSenderCurrentUser(messageData) ? 'bg-secondary dark:bg-primary ' : 'bg-white dark:bg-secondary-dark'">
+        <div onclick class=" w-full gap-2 text-sm font-medium group relative" :class="messageData.user_name === authStore.username ? 'mr-3 flex justify-end' : 'ml-3'">
+          <p class=" relative p-2 rounded-xl w-fit max-w-[75%] md:max-w-[68%] lg:max-w-[63%] xl:max-w-[56%] " :class="isSenderCurrentUser(messageData) ? 'bg-secondary dark:bg-primary ' : 'bg-white dark:bg-secondary-dark'">
             {{ messageData.message }}
+            <span class=" text-xs font-bold absolute top-[50%] group-hover:opacity-100 opacity-0 transition-opacity duration-300 -translate-y-[50%]" :class="isSenderCurrentUser(messageData) ? 'right-[100%] -translate-x-[10px]' : 'left-[100%] translate-x-[10px]'">
+              {{ getTimeString(messageData.createdAt) }}
+            </span>
           </p>
           <div v-if="!isTheSameSenderOrDifferentDate(messageData, index)" :class="isSenderCurrentUser(messageData) ? 'bubble-arrow right' : 'bubble-arrow'"></div>
         </div>        
