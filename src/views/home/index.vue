@@ -19,6 +19,7 @@ import UsersChat from "../../components/icons/UsersChat.vue";
 import Primary from "../../components/Button/Primary.vue";
 import { formatTimeString } from '../../helper/timeFormatter'
 import ChatView from '../../components/Home/ChatView.vue'
+import ChatMoreOption from "../../components/Menu/ChatMoreOption.vue";
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
@@ -30,6 +31,7 @@ const search = ref('')
 const filteredRooms = ref(roomStore.searchJoinedRoomByName(search.value))
 const newMessage = ref('')
 const logoutModal = ref(false)
+const showTime = ref(false)
 const browseModal = ref(false)
 
 function handleRoomChange(roomObject) {
@@ -133,15 +135,16 @@ watch([search, () => roomStore.joinedRooms], () => {
     <section class=" relative grow py-4 pr-4 pl-4 h-[100dvh] md:pl-0" :class="!selectedRoomObject && 'mobile-hide'">
       <Transition name="slide" mode="out-in">
         <div v-if="selectedRoomObject" class="w-full h-full flex flex-col gap-2">
-          <div class=" w-full backdrop-blur-sm bg-secondary/50 dark:bg-secondary-dark/20 shrink-0 flex gap-2 p-4 rounded-2xl items-center">        
+          <div class=" w-full z-10 backdrop-blur-sm bg-secondary/50 dark:bg-secondary-dark/20 shrink-0 flex gap-2 p-4 rounded-2xl items-center">        
             <button @click="selectedRoomObject = ''" class=" p-2 hover:bg-secondary dark:hover:bg-secondary-dark rounded-full transition-colors duration-300">
               <ChevronLeft class=" w-6 aspect-square" />
             </button>
             <img src="https://picsum.photos/400/300" alt="user profile picture" class=" w-10 aspect-square object-cover rounded-full shrink-0">
             <p class=" font-bold h-fit grow text-batext-base">{{ selectedRoomObject.name }}</p>
+            <ChatMoreOption @timeToggleClick="() => showTime = !showTime" />
           </div>
-          <div class=" h-1 grow ">
-            <ChatView :messagesData="selectedRoomObject.messages" />
+          <div class=" h-1 grow z-0">
+            <ChatView :showTime="showTime" :messagesData="selectedRoomObject.messages" />
           </div>
           <form autocomplete="off" @submit.prevent="handleNewMessage()" class=" shrink-0 flex gap-3">
             <div class=" grow">
