@@ -105,7 +105,7 @@ watch([search, () => roomStore.joinedRooms], () => {
           <div ref="roomsParent" class=" grow h-1  overflow-y-auto" :class="themeStore.isDarkTheme ? 'dark' : ''">
             <p v-if="filteredRooms.length === 0 && roomStore.joinedRooms.length !== 0" class=" text-center font-semibold" key="not-found">No Rooms Found</p>
             <div v-if="roomStore.joinedRooms.length === 0" class=" h-full grid place-items-center">
-              <div class=" mx-auto dark:bg-teal-100/5 bg-black/5 rounded-xl p-4 w-fit">
+              <div class=" mx-auto rounded-xl p-4 w-fit">
                 <UsersChat class=" mx-auto w-20 h-20" />
                 <p class=" font-semibold">You Haven't Join Any Room</p>
                 <Primary @click="browseModal = true" class=" !mx-auto mt-2 !px-3 text-sm !block">Browse Room</Primary>         
@@ -156,8 +156,11 @@ watch([search, () => roomStore.joinedRooms], () => {
             </Primary>
           </form>
         </div>
-        <div v-else  class=" bg-red-500 h-full hidden md:block">
-          background
+        <div v-else  class="  h-full flex justify-center items-center w-full flex-col">      
+          <div class=" p-5 rounded-xl dark:bg-white/5 bg-stone-800/5 flex flex-col w-fit  items-center gap-4 justify-center">
+            <img src="/logo.png" alt="logo image" class=" aspect-square w-24">
+            <p class=" font-semibold">Enter A Room To Start Chatting</p>
+          </div>
         </div>
       </Transition>
     </section>

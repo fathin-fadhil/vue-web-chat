@@ -71,6 +71,7 @@ function toggleShow(value) {
   content: "";
   position: absolute;
   position: fixed;
+  background-color: rgba(0, 0, 0, 0.18);
   top: 0;
   right: 0;
   bottom: 0;
