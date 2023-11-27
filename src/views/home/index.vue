@@ -20,6 +20,8 @@ import Primary from "../../components/Button/Primary.vue";
 import { formatTimeString } from '../../helper/timeFormatter'
 import ChatView from '../../components/Home/ChatView.vue'
 import ChatMoreOption from "../../components/Menu/ChatMoreOption.vue";
+import UsersGroup from "../../components/icons/UsersGroup.vue";
+import UserCirle from "../../components/icons/UserCircle.vue";
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
@@ -72,8 +74,8 @@ watch([search, () => roomStore.joinedRooms], () => {
   <main class="flex flex-row w-full min-h-[100dvh]">
     <Transition name="slide-left">
     <section v-if="['default', 'xs', 'sm'].includes(themeStore.activeBreakpoint) ? !selectedRoomObject : true " class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
-        <div class=" flex gap-4 shrink-0 bg-white/40 dark:bg-white/5 px-2 py-4 rounded-xl backdrop-blur-[2px] shadow-sm z-40">
-          <img src="https://picsum.photos/500" alt="user profile picture" class=" w-12 aspect-square object-cover rounded-full shrink-0">
+        <div class=" flex gap-4 items-center shrink-0 bg-white/40 dark:bg-white/5 px-2 py-4 rounded-xl backdrop-blur-[2px] shadow-sm z-40">
+          <UserCirle class=" w-10 h-10 " />
           <div class=" grow text-sm flex flex-col justify-center">
             <p class=" font-bold text-base">{{ authStore.username }}</p>
           </div>
@@ -111,8 +113,8 @@ watch([search, () => roomStore.joinedRooms], () => {
                 <Primary @click="browseModal = true" class=" !mx-auto mt-2 !px-3 text-sm !block">Browse Room</Primary>         
               </div>            
             </div>
-            <div @click="() => handleRoomChange(room)" v-for="(room, index) in filteredRooms" :key="room.id" :class="selectedRoomObject?.id === room.id ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" px-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
-              <img src="https://picsum.photos/400/300" alt="user profile picture" class=" h-12 aspect-square object-cover rounded-full shrink-0">
+            <div @click="() => handleRoomChange(room)" v-for="(room, index) in filteredRooms" :key="room.id" :class="selectedRoomObject?.id === room.id ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" pl-4 pr-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
+              <UsersGroup class=" w-8 h-8" />
               <div class=" grow text-sm min-h-[69px] flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
                 <div class=" flex align-bottom">
                   <p class=" font-semibold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
@@ -140,7 +142,7 @@ watch([search, () => roomStore.joinedRooms], () => {
             <button @click="selectedRoomObject = ''" class=" p-2 hover:bg-secondary dark:hover:bg-secondary-dark rounded-full transition-colors duration-300">
               <ChevronLeft class=" w-6 aspect-square" />
             </button>
-            <img src="https://picsum.photos/400/300" alt="user profile picture" class=" w-10 aspect-square object-cover rounded-full shrink-0">
+            <UsersGroup class=" w-8 h-8" />
             <p class=" font-bold h-fit grow text-batext-base">{{ selectedRoomObject.name }}</p>
             <ChatMoreOption @timeToggleClick="() => showTime = !showTime" @exitRoomClick="() => exitRoomModal = true" :showTime="showTime" />
           </div>
