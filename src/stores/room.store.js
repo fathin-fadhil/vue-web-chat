@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "@vue/reactivity";
 import useAxiosApiClient from "../helper/useAxiosApiClient";
 import { useAuthStore } from "./auth.store";
-import { onMounted } from "vue";
+import { io } from "socket.io-client";
 
 export const useRoomStore = defineStore('room', () => {
   const axiosApiClient = useAxiosApiClient()
@@ -10,10 +10,18 @@ export const useRoomStore = defineStore('room', () => {
 
   const rooms = ref(JSON.parse(localStorage.getItem('rooms')) || [])
   const joinedRooms = ref(JSON.parse(localStorage.getItem('joinedRooms')) || [])
+  const socketConnection = ref({})
 
   async function updateAllJoinedRoomMessages() {
     joinedRooms.value.forEach(async (room) => {
       await updateMessagesByRoomId(room.id)
+      const newSocket = io(import.meta.env.VITE_BASE_URL, {
+        query: {
+          'room_id': room.id
+        }
+      })
+      newSocket.on('new_message', async () => updateMessagesByRoomId(room.id))
+      socketConnection.value[room.id] = newSocket
     })
   }
 
@@ -40,6 +48,13 @@ export const useRoomStore = defineStore('room', () => {
       const res = await axiosApiClient.get(`/api/v1/room/${roomId}`)
       joinedRooms.value = [...joinedRooms.value, res.data.data]
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
+      const newSocket = io(import.meta.env.VITE_BASE_URL, {
+        query: {
+          'room_id': roomId
+        }
+      })
+      newSocket.on('new_message', () => updateMessagesByRoomId(roomId))
+      socketConnection.value[roomId] = newSocket
     } catch (error) {
       console.log("🚀 ~ file: room.store.js:48 ~ joinRoom ~ error:", error)      
     }
@@ -48,6 +63,7 @@ export const useRoomStore = defineStore('room', () => {
   function exitRoom(roomId) {
     joinedRooms.value = joinedRooms.value.filter(room => room.id !== roomId)
     localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
+    socketConnection.value[roomId].disconnect()
   }
 
   function checkAlreadyInRoom(roomId) {
@@ -55,7 +71,6 @@ export const useRoomStore = defineStore('room', () => {
   }
 
   async function sendMessageToRoomId(roomId, message) {
-    console.log(roomId, message)
     try {
       const res = await axiosApiClient.post('/api/v1/message', {
         room_id: roomId,
