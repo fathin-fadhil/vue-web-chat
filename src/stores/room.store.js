@@ -74,6 +74,14 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
+  async function deleteMessage(messageId) {
+    try {
+      await axiosApiClient.delete(`/api/v1/message/${messageId}`)
+    } catch (error) {
+      console.log("🚀 ~ file: room.store.js:81 ~ deleteMessage ~ error:", error)
+    }
+  }
+
   async function createNewRoom(newRoomName) {
     return await axiosApiClient.post('/api/v1/room', {
       name: newRoomName
@@ -110,7 +118,6 @@ export const useRoomStore = defineStore('room', () => {
       joinedRooms.value[roomIndex].messages = [...joinedRooms.value[roomIndex].messages, messageData]
     })
     newSocket.on('delete_message', ({messageId}) => {      
-      console.log(messageId)
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       joinedRooms.value[roomIndex].messages = joinedRooms.value[roomIndex].messages.filter(message => message.id !== messageId)
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
@@ -119,5 +126,5 @@ export const useRoomStore = defineStore('room', () => {
     socketConnection.value[roomId] = newSocket
   }
 
-  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom }
+  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom, deleteMessage }
 })

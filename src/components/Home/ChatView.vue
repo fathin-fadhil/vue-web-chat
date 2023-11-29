@@ -5,9 +5,13 @@ import { useAuthStore } from '../../stores/auth.store';
 import { formatChatDateString, getTimeString } from "../../helper/timeFormatter";
 import { onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
 import ChevronLeft from '../icons/ChevronLeft.vue';
+import Trash from '../icons/Trash.vue'
+import { useRoomStore } from '../../stores/room.store'
+import ConfirmModal from '../Modal/ConfirmModal.vue'
 
 const [ messagesParent ] = useAutoAnimate()
 const authStore = useAuthStore()
+const roomStore = useRoomStore()
 
 const props = defineProps({
   messagesData: {
@@ -21,9 +25,15 @@ const props = defineProps({
 })
 
 const scrollBottomPos = ref(0)
+const deleteConfirmModal = ref(false)
+const messageIdToBeDeleted = ref('')
 
 watch(() => props.messagesData, () => {
-  scrollToBottom()
+  if (messageIdToBeDeleted.value) {
+    messageIdToBeDeleted.value = ''
+    return;
+  }
+   scrollToBottom()
   messagesParent.value.classList.add('scroll-smooth')
 }, { flush: 'post' })
 
@@ -79,9 +89,14 @@ function isSenderCurrentUser(currentMessageObject) {
         <div onclick class=" w-full gap-2 text-sm font-medium group relative" :class="messageData.user_name === authStore.username ? 'mr-3 flex justify-end' : 'ml-3'">
           <p class=" relative p-2 rounded-xl w-fit max-w-[75%] md:max-w-[68%] lg:max-w-[63%] xl:max-w-[56%] " :class="isSenderCurrentUser(messageData) ? 'bg-secondary dark:bg-primary ' : 'bg-white dark:bg-secondary-dark'">
             {{ messageData.message }}
-            <span class=" text-xs font-bold absolute top-[50%] group-hover:opacity-100 opacity-0 transition-opacity duration-300 -translate-y-[50%]" :class="[isSenderCurrentUser(messageData) ? 'right-[100%] -translate-x-[10px]' : 'left-[100%] translate-x-[10px]', {'!opacity-100': showTime}]">
-              {{ getTimeString(messageData.createdAt) }}
-            </span>
+            <div class=" absolute top-[50%] gap-2 flex justify-center items-center -translate-y-[50%]" :class="isSenderCurrentUser(messageData) ? 'right-[100%] -translate-x-[10px]' : 'left-[100%] translate-x-[10px]'">
+              <span class=" text-xs font-bold group-hover:opacity-100 opacity-0 transition-all duration-300" :class="[isSenderCurrentUser(messageData) ? 'translate-x-[40px] group-hover:translate-x-0' : '', {'opacity-100': showTime}]">
+                {{ getTimeString(messageData.createdAt) }}
+              </span>
+              <button @click="() => {messageIdToBeDeleted = messageData.id; deleteConfirmModal = true}" v-if="isSenderCurrentUser(messageData)" class=" text-xs scale-0 block group-hover:scale-100 transition-all duration-300  rounded-lg hover:bg-red-500/10 text-red-500 p-1">
+                <Trash class="w-5 h-5" />
+              </button>
+            </div>
           </p>
           <div v-if="!isTheSameSenderOrDifferentDate(messageData, index)" :class="isSenderCurrentUser(messageData) ? 'bubble-arrow right' : 'bubble-arrow'"></div>
         </div>        
@@ -91,6 +106,9 @@ function isSenderCurrentUser(currentMessageObject) {
   <button @click="scrollToBottom" :class="scrollBottomPos < messagesParent?.scrollHeight -50 ? 'opacity-100 z-0' : 'opacity-0 -z-50'" class=" fixed grid transition-opacity duration-300 right-4 place-items-center bottom-24 rounded-full w-10 h-10 bg-accent/80">
     <ChevronLeft class=" h-7 w-7 -rotate-90 text-white"  />
   </button>
+  <Teleport to="body">
+    <ConfirmModal @confirmClick="() => {roomStore.deleteMessage(messageIdToBeDeleted); deleteConfirmModal = false; }" @toggle="(value) => deleteConfirmModal = value " :showModal="deleteConfirmModal" title="Unsend Message" body="Unsend This Message?" confirmText="Unsend" />
+  </Teleport>
 </template>
 
 <style scoped>
