@@ -8,6 +8,7 @@ import ChevronLeft from '../icons/ChevronLeft.vue';
 import Trash from '../icons/Trash.vue'
 import { useRoomStore } from '../../stores/room.store'
 import ConfirmModal from '../Modal/ConfirmModal.vue'
+import ChatBubble from '../icons/ChatBubble.vue'
 
 const [ messagesParent ] = useAutoAnimate()
 const authStore = useAuthStore()
@@ -75,6 +76,13 @@ function isSenderCurrentUser(currentMessageObject) {
 
 <template>
   <div id="chat_container" ref="messagesParent" class=" h-full overflow-y-auto overflow-x-hidden flex flex-col relative">
+    <div v-if="messagesData.length === 0" class=" flex justify-center items-center h-full" key="empty">
+      <div class=" flex flex-col items-center bg-black/ rounded-2xl p-3">
+        <ChatBubble class=" w-16 aspect-square text-primary" />  
+        <h1 class=" text-xl font-bold text-">Empty Room</h1>
+        <p>Send a message to start a conversation</p>
+      </div>
+    </div>
     <div :class="isTheSameSenderOrDifferentDate(messageData, index, false) ? 'mb-1' : 'mb-4'" v-for="(messageData, index) in messagesData" :key="messageData.id">
       <div v-if="formatChatDateString(messageData.createdAt) !== formatChatDateString(messagesData[index - 1]?.createdAt)" class=" w-fit text-primary dark:text-primary-dark text-xs mx-auto font-black rounded-xl py- px-4 "> 
         {{ formatChatDateString(messageData.createdAt) }} • {{ getTimeString(messageData.createdAt) }} 
