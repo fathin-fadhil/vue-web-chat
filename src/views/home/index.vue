@@ -7,8 +7,8 @@ import Moon from '../../components/icons/Moon.vue';
 import Search from '../../components/icons/Search.vue';
 import Logout from '../../components/icons/Logout.vue'
 import ChevronLeft from '../../components/icons/ChevronLeft.vue';
-import PaperPlane from '../../components/icons/PaperPlaneSolid.vue';
 import Close from '../../components/icons/Close.vue'
+import MessageInput from "../../components/Home/MessageInput.vue";
 import { onMounted, watch, watchEffect } from 'vue';
 import MoreOption from '../../components/Menu/RoomMoreOption.vue'
 import { useAuthStore } from "../../stores/auth.store";
@@ -32,7 +32,6 @@ const [ roomsParent ] = useAutoAnimate()
 const selectedRoomObject = ref(null)
 const search = ref('')
 const filteredRooms = ref(roomStore.searchJoinedRoomByName(search.value))
-const newMessage = ref('')
 const logoutModal = ref(false)
 const showTime = ref(false)
 const browseModal = ref(false)
@@ -46,11 +45,6 @@ function handleRoomChange(roomObject) {
   } else {
     selectedRoomObject.value = roomObject; 
   }
-}
-
-function handleNewMessage() {
-  roomStore.sendMessageToRoomId(selectedRoomObject.value.id, newMessage.value)
-  newMessage.value = ''
 }
 
 onMounted(() => {
@@ -148,17 +142,12 @@ watch([search, () => roomStore.joinedRooms], () => {
             <p class=" font-bold h-fit grow text-batext-base">{{ selectedRoomObject.name }}</p>
             <ChatMoreOption @timeToggleClick="() => showTime = !showTime" @exitRoomClick="() => exitRoomModal = true" :showTime="showTime" />
           </div>
-          <div class=" h-1 grow z-0">
+          <div class=" h-1 grow-[2] z-0">
             <ChatView :showTime="showTime" :messagesData="selectedRoomObject.messages" />
           </div>
-          <form autocomplete="off" @submit.prevent="handleNewMessage()" class=" shrink-0 flex gap-3">
-            <div class=" grow">
-              <input v-model="newMessage" id="message_input" type="text" class=" p-2 bg-white focus:ring-1 ring-teal-500/50 dark:bg-secondary-dark/90 w-full rounded-xl text-base" placeholder="Message">
-            </div>
-            <Primary type="submit" class=" shrink-0 !rounded-full !p-2 w-10 h-10 flex justify-center items-center">
-              <PaperPlane class=" w-5 h-5 text-white" />
-            </Primary>
-          </form>
+          <div class="shrink-0">
+            <MessageInput :roomId="selectedRoomObject.id"/>
+          </div>
         </div>
         <div v-else  class="  h-full flex justify-center items-center w-full flex-col">      
           <div class=" p-5 rounded-xl dark:bg-white/5 bg-stone-500/5 flex flex-col w-fit  items-center gap-4 justify-center">
