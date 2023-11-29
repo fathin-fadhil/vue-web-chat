@@ -64,11 +64,13 @@ onMounted(() => {
 watch([search, () => roomStore.joinedRooms], () => {
   filteredRooms.value = roomStore.searchJoinedRoomByName(search.value)
 })
+
+const enterTransDone = ref(false)
 </script>
 
 <template>
   <main class="flex flex-row w-full min-h-[100dvh]">
-    <Transition name="slide-left">
+    <Transition  name="slide-left">
     <section v-if="['default', 'xs', 'sm'].includes(themeStore.activeBreakpoint) ? !selectedRoomObject : true " class=" p-4 shrink-0 flex w-full md:min-w-[350px] md:w-[30vw] md:max-w-[500px] flex-col gap-4" >
         <div class=" flex gap-4 items-center shrink-0 bg-white/40 dark:bg-white/5 px-2 py-4 rounded-xl backdrop-blur-[2px] shadow-sm z-40">
           <UserCirle class=" w-10 h-10 " />
@@ -132,7 +134,7 @@ watch([search, () => roomStore.joinedRooms], () => {
     </Transition>
 
     <section class=" relative grow py-4 pr-4 pl-4 h-[100dvh] md:pl-0" :class="!selectedRoomObject && 'mobile-hide'">
-      <Transition name="slide" mode="out-in">
+      <Transition @after-enter="() => enterTransDone = true" @leave="() => enterTransDone = false"  name="slide" mode="out-in">
         <div v-if="selectedRoomObject" class="w-full h-full flex flex-col gap-2">
           <div class=" w-full z-10 backdrop-blur-[2px] bg-secondary/50 dark:bg-secondary-dark/50 shrink-0 flex gap-2 p-4 rounded-2xl items-center">        
             <button @click="selectedRoomObject = ''" class=" p-2 hover:bg-secondary dark:hover:bg-secondary-dark rounded-full transition-colors duration-300">
@@ -146,7 +148,7 @@ watch([search, () => roomStore.joinedRooms], () => {
             <ChatView :showTime="showTime" :messagesData="selectedRoomObject.messages" />
           </div>
           <div class="shrink-0">
-            <MessageInput :roomId="selectedRoomObject.id"/>
+            <MessageInput :enterTransDone="enterTransDone" :roomId="selectedRoomObject.id"/>
           </div>
         </div>
         <div v-else  class="  h-full flex justify-center items-center w-full flex-col">      
