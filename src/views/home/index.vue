@@ -22,6 +22,7 @@ import ChatView from '../../components/Home/ChatView.vue'
 import ChatMoreOption from "../../components/Menu/ChatMoreOption.vue";
 import UsersGroup from "../../components/icons/UsersGroup.vue";
 import UserCirle from "../../components/icons/UserCircle.vue";
+import CreateNewRoom from "../../components/Modal/CreateNewRoom.vue";
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
@@ -36,6 +37,7 @@ const logoutModal = ref(false)
 const showTime = ref(false)
 const browseModal = ref(false)
 const exitRoomModal = ref(false)
+const newRoomModal = ref(false)
 
 function handleRoomChange(roomObject) {
   if (!selectedRoomObject.value) {
@@ -94,7 +96,7 @@ watch([search, () => roomStore.joinedRooms], () => {
           <div class="my-4 px-4">
             <div class="flex mb-3 justify-between items-center">
               <h1 class=" text-2xl font-bold ">All Rooms</h1>
-              <MoreOption @browseClick="browseModal = !browseModal"/>
+              <MoreOption @newRoomClick="newRoomModal = true" @browseClick="browseModal = !browseModal"/>
             </div>
             <div class="relative w-full shrink-0">
               <input type="text" v-model="search" class=" p-2 bg-background focus:ring-1 ring-teal-500/50 dark:bg-secondary-dark/50 w-full rounded-xl text-base" placeholder="Search...">
@@ -171,6 +173,7 @@ watch([search, () => roomStore.joinedRooms], () => {
   <ConfirmModal @confirmClick="authStore.logout" @toggle="(value) => logoutModal = value " :showModal="logoutModal" title="Logout" body="Are you sure?" confirmText="Logout" />
   <BrowseRoom @toggle="(value) => browseModal = value" :showModal="browseModal" />
   <ConfirmModal @confirmClick="() => {roomStore.exitRoom(selectedRoomObject.id); selectedRoomObject = null; exitRoomModal = false}"  @toggle="(value) => exitRoomModal = value" :showModal="exitRoomModal" title="Exit" body="Exit from this room?" confirmText="Exit" />
+  <CreateNewRoom :showModal="newRoomModal" @toggle="(value) => newRoomModal = value" />
 </template>
 
 <style scoped>

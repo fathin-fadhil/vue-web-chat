@@ -30,7 +30,7 @@ function close() {
           </button>
         </li>
         <li class=" dark:hover:bg-white/10 hover:bg-black/10 transition-colors duration-300">
-          <button class=" flex gap-2 items-center py-2 px-4" >
+          <button @click="emits('newRoomClick')" class=" flex gap-2 items-center py-2 px-4" >
             <Plus />
             Create New Room
           </button>

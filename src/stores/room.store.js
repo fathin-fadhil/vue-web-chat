@@ -83,6 +83,12 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
+  async function createNewRoom(newRoomName) {
+    return await axiosApiClient.post('/api/v1/room', {
+      name: newRoomName
+    })
+  }
+
   function resetState() {
     rooms.value = []
     joinedRooms.value = []
@@ -99,5 +105,5 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
-  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages }
+  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom }
 })
