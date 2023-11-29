@@ -27,6 +27,8 @@ watch(() => props.messagesData, () => {
   messagesParent.value.classList.add('scroll-smooth')
 }, { flush: 'post' })
 
+watch(() => props.messagesData, () => console.log('message changed'))
+
 watch(() => props.messagesData, () => {
   messagesParent.value.classList.remove('scroll-smooth')
 }, {flush: 'pre'})

@@ -15,13 +15,7 @@ export const useRoomStore = defineStore('room', () => {
   async function updateAllJoinedRoomMessages() {
     joinedRooms.value.forEach(async (room) => {
       await updateMessagesByRoomId(room.id)
-      const newSocket = io(import.meta.env.VITE_BASE_URL, {
-        query: {
-          'room_id': room.id
-        }
-      })
-      newSocket.on('new_message', async () => updateMessagesByRoomId(room.id))
-      socketConnection.value[room.id] = newSocket
+      joinRoomWebSocket(room.id)
     })
   }
 
@@ -48,13 +42,7 @@ export const useRoomStore = defineStore('room', () => {
       const res = await axiosApiClient.get(`/api/v1/room/${roomId}`)
       joinedRooms.value = [...joinedRooms.value, res.data.data]
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
-      const newSocket = io(import.meta.env.VITE_BASE_URL, {
-        query: {
-          'room_id': roomId
-        }
-      })
-      newSocket.on('new_message', () => updateMessagesByRoomId(roomId))
-      socketConnection.value[roomId] = newSocket
+      joinRoomWebSocket(roomId)
     } catch (error) {
       console.log("🚀 ~ file: room.store.js:48 ~ joinRoom ~ error:", error)      
     }
@@ -103,6 +91,26 @@ export const useRoomStore = defineStore('room', () => {
     } catch (error) {
       console.log("🚀 ~ file: room.store.js:39 ~ joinRoom ~ error:", error)
     }
+  }
+
+  function joinRoomWebSocket(roomId){
+    const newSocket = io(import.meta.env.VITE_BASE_URL, {
+      query: {
+        'room_id': roomId
+      }
+    })
+
+    newSocket.on('new_message', (data) => {
+      updateMessagesByRoomId(roomId)
+    })
+    newSocket.on('delete_message', ({messageId}) => {      
+      console.log(messageId)
+      const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
+      joinedRooms.value[roomIndex].messages = joinedRooms.value[roomIndex].messages.filter(message => message.id !== messageId)
+      localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
+    })
+
+    socketConnection.value[roomId] = newSocket
   }
 
   return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom }
