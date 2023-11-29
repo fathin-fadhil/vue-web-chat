@@ -65,7 +65,10 @@ export const useRoomStore = defineStore('room', () => {
         user_name: authStore.username,
         message: message,
       })
-      await updateMessagesByRoomId(roomId)
+      console.log("🚀 ~ file: room.store.js:68 ~ sendMessageToRoomId ~ res:", res)
+      const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
+      joinedRooms.value[roomIndex].messages = [...joinedRooms.value[roomIndex].messages, res.data.data]
+      localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
     } catch (error) {
       console.log("🚀 ~ file: room.store.js:65 ~ sendMessageToRoomId ~ error:", error)      
     }
@@ -100,8 +103,11 @@ export const useRoomStore = defineStore('room', () => {
       }
     })
 
-    newSocket.on('new_message', (data) => {
-      updateMessagesByRoomId(roomId)
+    newSocket.on('new_message', ({messageData}) => {
+      //updateMessagesByRoomId(roomId)
+      if (messageData.user_name === authStore.username) return;
+      const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
+      joinedRooms.value[roomIndex].messages = [...joinedRooms.value[roomIndex].messages, messageData]
     })
     newSocket.on('delete_message', ({messageId}) => {      
       console.log(messageId)
