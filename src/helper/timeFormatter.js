@@ -43,22 +43,22 @@ export function formatChatDateString(dateString) {
 
   // Check if the date is today
   if (
-    now.getUTCFullYear() === date.getUTCFullYear() &&
-    now.getUTCMonth() === date.getUTCMonth() &&
-    now.getUTCDate() === date.getUTCDate()
+    now.getFullYear() === date.getFullYear() &&
+    now.getMonth() === date.getMonth() &&
+    now.getDate() === date.getDate()
   ) {
     return "Today";
   }
 
   // Check if the date is more than 1 week ago
   const oneWeekAgo = new Date(now);
-  oneWeekAgo.setUTCDate(oneWeekAgo.getUTCDate() - 7);
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
   if (date < oneWeekAgo) {
-    const formattedDate = `${date.getUTCDate()}/${date.getUTCMonth() + 1}/${date.getUTCFullYear()}`;
+    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
     return formattedDate;
   }
 
   // Return the day of the week
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  return daysOfWeek[date.getUTCDay()];
+  return daysOfWeek[date.getDay()];
 }
