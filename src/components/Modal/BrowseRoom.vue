@@ -53,7 +53,7 @@ function handleJoin(roomId) {
   </transition>
   <transition name="pop" appear>
     <div v-if="showModal" class="modal px-4 max-w-lg w-full h-[90dvh]">
-      <div class="flex flex-col overflow-auto backdrop-blur-lg h-full bg-white/80 dark:bg-[rgb(6,14,8)]/90 rounded-2xl" role="dialog" >
+      <div class="flex flex-col overflow-auto backdrop-blur-lg h-full bg-white/80 dark:bg-[#1f423a]/50 rounded-2xl" role="dialog" >
         <section class=" grow px-8 pt-6 pb-1 flex flex-col justify-start gap-2">
           <h1 class=" font-bold text-2xl shrink-0 mb-2">Browse Rooms</h1>
           <div class="relative w-full shrink-0">

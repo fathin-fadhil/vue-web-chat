@@ -33,7 +33,7 @@ function toggleShow(value) {
     <div class="modal-overlay" v-if="showModal" @click="toggleShow(false)" ></div>
   </transition>
   <transition name="pop" appear>
-    <div class="modal w-fit overflow-hidden max-w-lg bg-white/90 dark:bg-zinc-700/90 rounded-2xl h-fit" role="dialog" v-if="showModal">
+    <div class="modal w-fit overflow-hidden max-w-lg bg-white/80  dark:bg-neutral-800/50 rounded-2xl h-fit" role="dialog" v-if="showModal">
       <div class=" px-24 py-6 flex flex-col justify-start gap-2">
         <h1 class=" font-bold text-center text-lg">{{ title }}</h1>
         <p class=" text-sm">{{ body }}</p>

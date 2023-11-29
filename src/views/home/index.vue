@@ -90,7 +90,7 @@ watch([search, () => roomStore.joinedRooms], () => {
           </div>
         </div>
   
-        <div class=" bg-secondary/50 dark:bg-secondary-dark/20 grow rounded-2xl flex-col shadow-xl flex backdrop-blur-sm z-10" >
+        <div class=" bg-secondary/50 dark:bg-secondary-dark/50 grow rounded-2xl flex-col shadow-xl flex backdrop-blur-[2px] z-10 " >
           <div class="my-4 px-4">
             <div class="flex mb-3 justify-between items-center">
               <h1 class=" text-2xl font-bold ">All Rooms</h1>
@@ -138,7 +138,7 @@ watch([search, () => roomStore.joinedRooms], () => {
     <section class=" relative grow py-4 pr-4 pl-4 h-[100dvh] md:pl-0" :class="!selectedRoomObject && 'mobile-hide'">
       <Transition name="slide" mode="out-in">
         <div v-if="selectedRoomObject" class="w-full h-full flex flex-col gap-2">
-          <div class=" w-full z-10 backdrop-blur-sm bg-secondary/50 dark:bg-secondary-dark/20 shrink-0 flex gap-2 p-4 rounded-2xl items-center">        
+          <div class=" w-full z-10 backdrop-blur-[2px] bg-secondary/50 dark:bg-secondary-dark/50 shrink-0 flex gap-2 p-4 rounded-2xl items-center">        
             <button @click="selectedRoomObject = ''" class=" p-2 hover:bg-secondary dark:hover:bg-secondary-dark rounded-full transition-colors duration-300">
               <ChevronLeft class=" w-6 aspect-square" />
             </button>
@@ -159,7 +159,7 @@ watch([search, () => roomStore.joinedRooms], () => {
           </form>
         </div>
         <div v-else  class="  h-full flex justify-center items-center w-full flex-col">      
-          <div class=" p-5 rounded-xl dark:bg-white/5 bg-stone-800/5 flex flex-col w-fit  items-center gap-4 justify-center">
+          <div class=" p-5 rounded-xl dark:bg-white/5 bg-stone-500/5 flex flex-col w-fit  items-center gap-4 justify-center">
             <img src="/logo.png" alt="logo image" class=" aspect-square w-24">
             <p class=" font-semibold">Enter A Room To Start Chatting</p>
           </div>
