@@ -61,7 +61,7 @@ onMounted(() => {
   roomStore.updateAllJoinedRoomMessages()
 })
 
-watch([search, () => roomStore.joinedRooms], () => {
+watch([search, () => roomStore.joinedRooms, () => roomStore.sortedJoinedRooms], () => {
   filteredRooms.value = roomStore.searchJoinedRoomByName(search.value)
 })
 

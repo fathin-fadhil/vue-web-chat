@@ -3,6 +3,7 @@ import { ref } from "@vue/reactivity";
 import useAxiosApiClient from "../helper/useAxiosApiClient";
 import { useAuthStore } from "./auth.store";
 import { io } from "socket.io-client";
+import { computed } from "vue";
 
 export const useRoomStore = defineStore('room', () => {
   const axiosApiClient = useAxiosApiClient()
@@ -11,14 +12,18 @@ export const useRoomStore = defineStore('room', () => {
   const rooms = ref(JSON.parse(localStorage.getItem('rooms')) || [])
   const joinedRooms = ref(JSON.parse(localStorage.getItem('joinedRooms')) || [])
   const socketConnection = ref({})
+  const sortedJoinedRooms = computed(() => {
+    return joinedRooms.value.toSorted((roomA, roomB) => new Date(roomB.messages.at(-1)?.createdAt || 0) - new Date(roomA.messages.at(-1)?.createdAt || 0))
+  })
 
+  
   async function updateAllJoinedRoomMessages() {
     joinedRooms.value.forEach(async (room) => {
       await updateMessagesByRoomId(room.id)
       joinRoomWebSocket(room.id)
     })
   }
-
+  
   async function getRooms() {
     try {
       const res = await axiosApiClient.get('/api/v1/room')
@@ -28,13 +33,13 @@ export const useRoomStore = defineStore('room', () => {
       console.log("🚀 ~ file: index.vue:104 ~ getRooms ~ error:", error)
     }
   }
-
+  
   function searchRoomByName(searchWord) {
     return rooms.value.filter(room => room.name.toLowerCase().includes(searchWord.toLowerCase()))
   }
-
+  
   function searchJoinedRoomByName(searchWord) {
-    return joinedRooms.value.filter(room => room.name.toLowerCase().includes(searchWord.toLowerCase()))
+    return sortedJoinedRooms.value.filter(room => room.name.toLowerCase().includes(searchWord.toLowerCase()))
   }
 
   async function joinRoom(roomId) {
@@ -65,7 +70,6 @@ export const useRoomStore = defineStore('room', () => {
         user_name: authStore.username,
         message: message,
       })
-      console.log("🚀 ~ file: room.store.js:68 ~ sendMessageToRoomId ~ res:", res)
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       joinedRooms.value[roomIndex].messages = [...joinedRooms.value[roomIndex].messages, res.data.data]
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
@@ -126,5 +130,5 @@ export const useRoomStore = defineStore('room', () => {
     socketConnection.value[roomId] = newSocket
   }
 
-  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom, deleteMessage }
+  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom, deleteMessage, sortedJoinedRooms }
 })
