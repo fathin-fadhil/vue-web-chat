@@ -70,9 +70,6 @@ export const useRoomStore = defineStore('room', () => {
         user_name: authStore.username,
         message: message,
       })
-      const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
-      joinedRooms.value[roomIndex].messages = [...joinedRooms.value[roomIndex].messages, res.data.data]
-      localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
     } catch (error) {
       console.log("🚀 ~ file: room.store.js:65 ~ sendMessageToRoomId ~ error:", error)      
     }
@@ -90,6 +87,12 @@ export const useRoomStore = defineStore('room', () => {
     return await axiosApiClient.post('/api/v1/room', {
       name: newRoomName
     })
+  }
+
+  function setAsRead(roomId) {
+    const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
+    joinedRooms.value[roomIndex]['hasUnread'] = false
+    localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
   }
 
   function resetState() {
@@ -117,9 +120,10 @@ export const useRoomStore = defineStore('room', () => {
 
     newSocket.on('new_message', ({messageData}) => {
       //updateMessagesByRoomId(roomId)
-      if (messageData.user_name === authStore.username) return;
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       joinedRooms.value[roomIndex].messages = [...joinedRooms.value[roomIndex].messages, messageData]
+      joinedRooms.value[roomIndex]['hasUnread'] = true
+      localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
     })
     newSocket.on('delete_message', ({messageId}) => {      
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
@@ -130,5 +134,5 @@ export const useRoomStore = defineStore('room', () => {
     socketConnection.value[roomId] = newSocket
   }
 
-  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom, deleteMessage, sortedJoinedRooms }
+  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom, deleteMessage, sortedJoinedRooms, setAsRead }
 })

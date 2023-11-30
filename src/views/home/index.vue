@@ -45,6 +45,7 @@ function handleRoomChange(roomObject) {
   } else {
     selectedRoomObject.value = roomObject; 
   }
+  roomStore.setAsRead(roomObject.id)
 }
 
 onMounted(() => {
@@ -115,16 +116,16 @@ const enterTransDone = ref(false)
               <UsersGroup class=" w-8 h-8" />
               <div class=" grow text-sm min-h-[69px] flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
                 <div class=" flex align-bottom">
-                  <p class=" font-semibold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
+                  <p class=" font-bold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
                   <span v-if="room.messages.length > 0" class=" text-xs shrink-0">
                     {{ formatTimeString(room.messages.at(-1)?.createdAt) }}
                   </span>
                 </div>
                 <div v-if="room.messages.length > 0" class="flex gap-2">
-                  <p class="grow text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden ">
+                  <p class="grow text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden " :class="{'font-bold': room.hasUnread}">
                     {{ room.messages.at(-1)?.message }}
                   </p>
-                  <span v-if="Math.random() > 0.5" class=" shrink-0 text-xs grid place-content-center  w-3 h-3 ml-auto rounded-full bg-primary dark:bg-primary-dark"></span>
+                  <span v-if="room.hasUnread" class=" shrink-0 text-xs grid place-content-center  w-3 h-3 ml-auto rounded-full bg-primary dark:bg-primary-dark"></span>
                 </div>
               </div>
             </div>
@@ -145,7 +146,7 @@ const enterTransDone = ref(false)
             <ChatMoreOption @timeToggleClick="() => showTime = !showTime" @exitRoomClick="() => exitRoomModal = true" :showTime="showTime" />
           </div>
           <div class=" h-1 grow-[2] z-0">
-            <ChatView :showTime="showTime" :messagesData="selectedRoomObject.messages" />
+            <ChatView :showTime="showTime" :roomId="selectedRoomObject.id" :messagesData="selectedRoomObject.messages" />
           </div>
           <div class="shrink-0">
             <MessageInput :enterTransDone="enterTransDone" :roomId="selectedRoomObject.id"/>

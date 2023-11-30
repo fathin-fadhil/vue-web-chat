@@ -22,6 +22,10 @@ const props = defineProps({
   showTime: {
     type: Boolean,
     required: true
+  },
+  roomId: {
+    type: String,
+    required: true
   }
 })
 
@@ -36,6 +40,7 @@ watch(() => props.messagesData, () => {
   }
    scrollToBottom()
   messagesParent.value.classList.add('scroll-smooth')
+  roomStore.setAsRead(props.roomId)
 }, { flush: 'post' })
 
 watch(() => props.messagesData, () => {
