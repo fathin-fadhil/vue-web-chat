@@ -113,7 +113,7 @@ const enterTransDone = ref(false)
               </div>            
             </div>
             <div @click="() => handleRoomChange(room)" v-for="(room, index) in filteredRooms" :key="room.id" :class="selectedRoomObject?.id === room.id ? 'bg-black/10 dark:bg-white/10' : 'hover:bg-black/5 dark:hover:bg-white/5'" class=" pl-4 pr-2 flex gap-4 shrink-0 transition-all duration-200 hover:cursor-pointer select-none items-center">
-              <UsersGroup class=" w-8 h-8" />
+              <UsersGroup class=" shrink-0 w-8 h-8" />
               <div class=" grow text-sm min-h-[69px] flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
                 <div class=" flex align-bottom">
                   <p class=" font-bold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
