@@ -10,6 +10,7 @@
   "dependencies": {
     "@formkit/auto-animate": "^0.8.1",
     "axios": "^1.6.2",
+    "emoji-picker-element": "^1.19.2",
     "moment": "^2.29.4",
     "pinia": "^2.1.6",
     "remixicon": "^3.5.0",

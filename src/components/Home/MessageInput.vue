@@ -3,8 +3,11 @@ import PaperPlane from '../icons/PaperPlaneSolid.vue'
 import Primary from '../Button/Primary.vue'
 import { ref } from "@vue/reactivity";
 import { useRoomStore } from '../../stores/room.store';
+import { useDraftStore } from '../../stores/draft.store';
 import Spinner from '../icons/Spinner.vue';
-import { nextTick, onMounted, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue';
+import Emoji from '../icons/Emoji.vue'
+import 'emoji-picker-element'
 
 const props = defineProps({
   roomId: {
@@ -17,17 +20,20 @@ const props = defineProps({
 })
 
 const roomStore = useRoomStore()
+const draftStore = useDraftStore()
 
-const newMessage = ref({})
 const isLoading = ref(false)
+const showEmojiPopup = ref(false)
 const inputRef = ref()
+const emojiPickerRef = ref()
 
 async function handleNewMessage() {
-  if (!newMessage.value[props.roomId] || isLoading.value) return;
+  if (!draftStore.messageDraftByRoomId[props.roomId] || isLoading.value) return;
   isLoading.value = true
+  showEmojiPopup.value = false
 
-  await roomStore.sendMessageToRoomId(props.roomId, newMessage.value[props.roomId])
-  newMessage.value[props.roomId] = ''
+  await roomStore.sendMessageToRoomId(props.roomId, draftStore.messageDraftByRoomId[props.roomId])
+  draftStore.clearRoomDraft(props.roomId)
   isLoading.value = false
 
 /*   await nextTick()
@@ -38,12 +44,39 @@ async function handleNewMessage() {
   await nextTick()
   if (props.enterTransDone) inputRef.value.focus()
 }) */
+
+async function addEmoji(emojiEvent) {
+  const cursorPosition = inputRef.value.selectionEnd
+  const start = draftStore.messageDraftByRoomId[props.roomId].substring(0, inputRef.value.selectionStart)
+  const end = draftStore.messageDraftByRoomId[props.roomId].substring(inputRef.value.selectionStart)
+  draftStore.setDraftText(props.roomId, start + emojiEvent.detail.unicode + end)
+  inputRef.value.focus()
+  await nextTick()
+  inputRef.value.selectionEnd = cursorPosition + emojiEvent.detail.unicode.length
+}
+
+onMounted(() => {
+  emojiPickerRef.value.addEventListener('emoji-click', addEmoji)
+  draftStore.messageDraftByRoomId[props.roomId] = ''
+})
+
+onBeforeUnmount(() => emojiPickerRef.value.removeEventListener('emoji-click', addEmoji))
+
+watch(() => props.roomId, () => {
+  draftStore.messageDraftByRoomId[props.roomId] = draftStore.messageDraftByRoomId[props.roomId] ?? ''
+})
 </script>
 
 <template>
   <form autocomplete="off" @submit.prevent="handleNewMessage()" class="flex gap-3 w-full h-full">
-    <div class=" grow">
-      <input ref="inputRef" :disabled="isLoading" v-model="newMessage[roomId]" id="message_input" type="text" class=" p-3 bg-white ring-2 ring-primary placeholder:dark:text-accent-dark/50 placeholder:text-accent/70 dark:bg-secondary-dark/90 w-full rounded-3xl text-base disabled:cursor-not-allowed" placeholder="Message">
+    <div class=" grow  relative">
+      <div :class="!showEmojiPopup && 'hidden'" class="absolute bottom-14">
+        <emoji-picker ref="emojiPickerRef"></emoji-picker>
+      </div>
+      <button @click="showEmojiPopup = !showEmojiPopup" type="button" class=" rounded-full p-2 absolute translate-x-1 top-[50%] -translate-y-[50%] hover:bg-black/20 dark:hover:bg-white/20">
+        <Emoji class=" text-primary w-6 h-6 dark:text-primary-dark" />
+      </button>
+      <input ref="inputRef" :disabled="isLoading" v-model="draftStore.messageDraftByRoomId[roomId]" id="message_input" type="text" class=" pl-12 p-3 bg-white focus:ring-2 ring-primary dark:ring-primary-dark placeholder:dark:text-accent-dark/50 placeholder:text-accent/70 dark:bg-secondary-dark/90 w-full rounded-3xl text-base disabled:cursor-not-allowed" placeholder="Message">
     </div>
     <Primary type="submit" class=" shrink-0 !rounded-full !p-2 flex justify-center items-center h-full aspect-square" :class="{'cursor-not-allowed': isLoading}">
       <PaperPlane v-if="!isLoading" class=" w-5 h-5 text-white" />
