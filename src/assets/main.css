@@ -25,6 +25,10 @@ input {
   @apply focus:outline-none;
 }
 
+emoji-picker {
+  --border-size: 0px
+}
+
 ::-webkit-scrollbar-thumb {
   @apply bg-black/20 dark:bg-white/10;
   border-radius: 10px;

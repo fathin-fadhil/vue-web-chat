@@ -4,6 +4,7 @@ import Primary from '../Button/Primary.vue'
 import { ref } from "@vue/reactivity";
 import { useRoomStore } from '../../stores/room.store';
 import { useDraftStore } from '../../stores/draft.store';
+import { useThemeStore } from "../../stores/theme.store";
 import Spinner from '../icons/Spinner.vue';
 import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue';
 import Emoji from '../icons/Emoji.vue'
@@ -21,6 +22,7 @@ const props = defineProps({
 
 const roomStore = useRoomStore()
 const draftStore = useDraftStore()
+const themeStore = useThemeStore()
 
 const isLoading = ref(false)
 const showEmojiPopup = ref(false)
@@ -70,8 +72,8 @@ watch(() => props.roomId, () => {
 <template>
   <form autocomplete="off" @submit.prevent="handleNewMessage()" class="flex gap-3 w-full h-full">
     <div class=" grow  relative">
-      <div :class="!showEmojiPopup && 'hidden'" class="absolute bottom-14">
-        <emoji-picker ref="emojiPickerRef"></emoji-picker>
+      <div :class="!showEmojiPopup && 'scale-y-0'" class="absolute origin-bottom bottom-14 rounded-xl shadow-xl transition-all duration-300 scale-y-100 overflow-hidden">
+        <emoji-picker :class="{'dark': themeStore.isDarkTheme}" ref="emojiPickerRef"></emoji-picker>
       </div>
       <button @click="showEmojiPopup = !showEmojiPopup" type="button" class=" rounded-full p-2 absolute translate-x-1 top-[50%] -translate-y-[50%] hover:bg-black/20 dark:hover:bg-white/20">
         <Emoji class=" text-primary w-6 h-6 dark:text-primary-dark" />
