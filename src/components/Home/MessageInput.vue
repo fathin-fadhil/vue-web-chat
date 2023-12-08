@@ -72,7 +72,7 @@ watch(() => props.roomId, () => {
 <template>
   <form autocomplete="off" @submit.prevent="handleNewMessage()" class="flex gap-3 w-full h-full">
     <div class=" grow  relative">
-      <div :class="!showEmojiPopup && 'scale-y-0'" class="absolute origin-bottom bottom-14 rounded-xl shadow-xl transition-all duration-300 scale-y-100 overflow-hidden">
+      <div :class="{'!scale-y-0' : !showEmojiPopup}" class="absolute origin-bottom bottom-14 rounded-xl shadow-xl transition-all duration-300 scale-y-100 overflow-hidden">
         <emoji-picker :class="{'dark': themeStore.isDarkTheme}" ref="emojiPickerRef"></emoji-picker>
       </div>
       <button @click="showEmojiPopup = !showEmojiPopup" type="button" class=" rounded-full p-2 absolute translate-x-1 top-[50%] -translate-y-[50%] hover:bg-black/20 dark:hover:bg-white/20">

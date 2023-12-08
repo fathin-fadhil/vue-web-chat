@@ -1,28 +1,30 @@
 <script setup>
-import { useThemeStore } from "../../stores/theme.store";
-import { useRoomStore } from "../../stores/room.store";
-import { ref } from "@vue/reactivity";
 import Sun from '../../components/icons/Sun.vue';
 import Moon from '../../components/icons/Moon.vue';
 import Search from '../../components/icons/Search.vue';
 import Logout from '../../components/icons/Logout.vue'
 import ChevronLeft from '../../components/icons/ChevronLeft.vue';
 import Close from '../../components/icons/Close.vue'
-import MessageInput from "../../components/Home/MessageInput.vue";
-import { onMounted, watch, watchEffect } from 'vue';
-import MoreOption from '../../components/Menu/RoomMoreOption.vue'
-import { useAuthStore } from "../../stores/auth.store";
-import ConfirmModal from "../../components/Modal/ConfirmModal.vue";
-import BrowseRoom from "../../components/Modal/BrowseRoom.vue";
-import { useAutoAnimate } from "@formkit/auto-animate/vue";
-import UsersChat from "../../components/icons/UsersChat.vue";
-import Primary from "../../components/Button/Primary.vue";
-import { formatTimeString } from '../../helper/timeFormatter'
-import ChatView from '../../components/Home/ChatView.vue'
 import ChatMoreOption from "../../components/Menu/ChatMoreOption.vue";
 import UsersGroup from "../../components/icons/UsersGroup.vue";
 import UserCirle from "../../components/icons/UserCircle.vue";
+import UsersChat from "../../components/icons/UsersChat.vue";
+
+import { onMounted, watch } from 'vue';
+import { ref } from "@vue/reactivity";
+import { useThemeStore } from "../../stores/theme.store";
+import { useRoomStore } from "../../stores/room.store";
+import { useAuthStore } from "../../stores/auth.store";
+import { formatTimeString } from '../../helper/timeFormatter'
+import { useAutoAnimate } from "@formkit/auto-animate/vue";
+
+import MessageInput from "../../components/Home/MessageInput.vue";
+import MoreOption from '../../components/Menu/RoomMoreOption.vue'
 import CreateNewRoom from "../../components/Modal/CreateNewRoom.vue";
+import ChatView from '../../components/Home/ChatView.vue'
+import Primary from "../../components/Button/Primary.vue";
+import BrowseRoom from "../../components/Modal/BrowseRoom.vue";
+import ConfirmModal from "../../components/Modal/ConfirmModal.vue";
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
