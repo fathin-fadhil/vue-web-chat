@@ -41,9 +41,9 @@ const deleteConfirmModal = ref(false)
 const messageIdToBeDeleted = ref('')
 const lastMessageObserver = ref()
 
-const messagesData = computed(() => roomStore.messagesByRoomId[props.roomId] ?? [])
+const messagesData = computed(() => roomStore.messagesByRoomId[props.roomId])
 
-watch(() => messagesData, () => {
+watch(() => messagesData.value, () => {
   lastMessageObserver.value?.disconnect()
   if (messagesData.length === 0) return
   lastMessageObserver.value = new IntersectionObserver((entries) => {
@@ -75,7 +75,6 @@ onMounted(() => {
   scrollToBottom()
   messagesParent.value?.addEventListener('scroll', updateScrollPos)
   messagesParent.value.classList.add('scroll-smooth')
-
 })
 
 watch(() => props.roomId, () => {
@@ -104,7 +103,7 @@ function updateScrollPos(ev) {
 
 function isTheSameSenderOrDifferentDate(currentMessageObject, messageIndex, fromPreviousMessage = true) {
   const indexShift = fromPreviousMessage ? -1 : 1
-  const messageDataToBeCompared = messagesData[messageIndex + indexShift]
+  const messageDataToBeCompared = messagesData.value[messageIndex + indexShift]
   if (fromPreviousMessage && formatChatDateString(currentMessageObject.createdAt) !== formatChatDateString(messageDataToBeCompared?.createdAt)) {
     return false
   }

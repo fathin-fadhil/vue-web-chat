@@ -42,11 +42,7 @@ const newRoomModal = ref(false)
 
 function handleRoomChange(roomObject) {
   if (!selectedRoomObject.value) window.history.pushState({}, null, null)
-  const roomObjectInfo = {}
-  roomObjectInfo.id = roomObject.id; 
-  roomObjectInfo.hasUnread = roomObject.hasUnread; 
-  roomObjectInfo.event = roomObject.event; 
-  selectedRoomObject.value = roomObjectInfo
+  selectedRoomObject.value = roomObject
 }
 
 onMounted(() => {
