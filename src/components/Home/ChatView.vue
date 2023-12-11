@@ -45,7 +45,7 @@ const messagesData = computed(() => roomStore.messagesByRoomId[props.roomId])
 
 watch(() => messagesData.value, () => {
   lastMessageObserver.value?.disconnect()
-  if (messagesData.length === 0) return
+  if (messagesData.value.length === 0) return
   lastMessageObserver.value = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) {
       roomStore.setAsRead(props.roomId)
