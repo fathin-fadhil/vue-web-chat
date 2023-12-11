@@ -147,7 +147,7 @@ const enterTransDone = ref(false)
             <ChatMoreOption @timeToggleClick="() => showTime = !showTime" @exitRoomClick="() => exitRoomModal = true" :showTime="showTime" />
           </div>
           <div class=" h-1 grow-[2] z-0">
-            <ChatView :showTime="showTime" :roomId="selectedRoomObject.id" :chatEvent="selectedRoomObject.event ?? ''" :messagesData="selectedRoomObject.messages" :hasUnread="selectedRoomObject.hasUnread" />
+            <ChatView :showTime="showTime" :roomId="selectedRoomObject.id" :chatEvent="selectedRoomObject.event ?? ''" :messagesData="selectedRoomObject.messages" :hasUnread="selectedRoomObject.hasUnread ?? false" />
           </div>
           <div class="shrink-0">
             <MessageInput :enterTransDone="enterTransDone" :roomId="selectedRoomObject.id"/>

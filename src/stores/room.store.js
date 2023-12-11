@@ -128,10 +128,10 @@ export const useRoomStore = defineStore('room', () => {
       //updateMessagesByRoomId(roomId)
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       joinedRooms.value[roomIndex].messages = [...joinedRooms.value[roomIndex].messages, messageData]
-      joinedRooms.value[roomIndex]['hasUnread'] = true
       if (messageData.user_name === authStore.username) {
         joinedRooms.value[roomIndex]['event'] = 'message_sent'
       } else {
+        joinedRooms.value[roomIndex]['hasUnread'] = true
         joinedRooms.value[roomIndex]['event'] = 'new_received_message'
       }
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))

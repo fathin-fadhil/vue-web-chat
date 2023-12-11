@@ -43,6 +43,7 @@ const lastMessageObserver = ref()
 
 watch(() => props.messagesData, () => {
   lastMessageObserver.value?.disconnect()
+  if (props.messagesData.length === 0) return
   lastMessageObserver.value = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) {
       roomStore.setAsRead(props.roomId)
@@ -150,8 +151,9 @@ function isSenderCurrentUser(currentMessageObject) {
       </div>
     </div>
   </div>
-  <button @click="scrollToBottom" :class="scrollBottomPos < messagesParent?.scrollHeight -50 ? 'opacity-100 z-0' : 'opacity-0 -z-50'" class=" fixed grid transition-opacity duration-300 right-4 place-items-center bottom-24 rounded-full w-10 h-10 bg-accent/80">
+  <button @click="scrollToBottom" :class="scrollBottomPos < messagesParent?.scrollHeight - 100 ? 'opacity-100' : 'opacity-0'" :disabled="!(scrollBottomPos <= messagesParent?.scrollHeight - 100)" class=" fixed grid transition-opacity duration-300 right-4 place-items-center bottom-24 rounded-full w-10 h-10 bg-accent/80">
     <ChevronLeft class=" h-7 w-7 -rotate-90 text-white"  />
+    <div v-if="hasUnread" class="w-3 h-3 absolute left-0 bottom-0 bg-primary rounded-full"></div>
   </button>
   <Teleport to="body">
     <ConfirmModal @confirmClick="() => {roomStore.deleteMessage(messageIdToBeDeleted); deleteConfirmModal = false; }" @toggle="(value) => deleteConfirmModal = value " :showModal="deleteConfirmModal" title="Unsend Message" body="Unsend This Message?" confirmText="Unsend" />
