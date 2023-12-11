@@ -41,18 +41,18 @@ const exitRoomModal = ref(false)
 const newRoomModal = ref(false)
 
 function handleRoomChange(roomObject) {
-  if (!selectedRoomObject.value) {
-    selectedRoomObject.value = roomObject; 
-    window.history.pushState({}, null, null)
-  } else {
-    selectedRoomObject.value = roomObject; 
-  }
+  if (!selectedRoomObject.value) window.history.pushState({}, null, null)
+  const roomObjectInfo = {}
+  roomObjectInfo.id = roomObject.id; 
+  roomObjectInfo.hasUnread = roomObject.hasUnread; 
+  roomObjectInfo.event = roomObject.event; 
+  selectedRoomObject.value = roomObjectInfo
 }
 
 onMounted(() => {
   addEventListener('popstate', () => {
     if (selectedRoomObject.value) {
-      selectedRoomObject.value = ''
+      selectedRoomObject.value = null
     }
   })
 
@@ -147,7 +147,7 @@ const enterTransDone = ref(false)
             <ChatMoreOption @timeToggleClick="() => showTime = !showTime" @exitRoomClick="() => exitRoomModal = true" :showTime="showTime" />
           </div>
           <div class=" h-1 grow-[2] z-0">
-            <ChatView :showTime="showTime" :roomId="selectedRoomObject.id" :chatEvent="selectedRoomObject.event ?? ''" :messagesData="selectedRoomObject.messages" :hasUnread="selectedRoomObject.hasUnread ?? false" />
+            <ChatView :showTime="showTime" :roomId="selectedRoomObject.id" :chatEvent="selectedRoomObject.event ?? ''"  :hasUnread="selectedRoomObject.hasUnread ?? false" />
           </div>
           <div class="shrink-0">
             <MessageInput :enterTransDone="enterTransDone" :roomId="selectedRoomObject.id"/>
