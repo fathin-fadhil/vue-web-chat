@@ -1,5 +1,4 @@
 <script setup>
-import { useAutoAnimate } from '@formkit/auto-animate/vue';
 import { getInitials } from '../../helper/userHelper';
 import { useAuthStore } from '../../stores/auth.store';
 import { formatChatDateString, getTimeString } from "../../helper/timeFormatter";
@@ -10,7 +9,6 @@ import { useRoomStore } from '../../stores/room.store'
 import ConfirmModal from '../Modal/ConfirmModal.vue'
 import ChatBubble from '../icons/ChatBubble.vue'
 
-const messagesParent = ref()
 const authStore = useAuthStore()
 const roomStore = useRoomStore()
 
@@ -26,22 +24,55 @@ const props = defineProps({
   roomId: {
     type: String,
     required: true
+  },
+  chatEvent: {
+    type: String,
+    required: true
+  },
+  hasUnread: {
+    type: Boolean,
+    required: true
   }
 })
 
+const messagesParent = ref()
 const scrollBottomPos = ref(0)
 const deleteConfirmModal = ref(false)
 const messageIdToBeDeleted = ref('')
+const lastMessageObserver = ref()
 
 watch(() => props.messagesData, () => {
-  scrollToBottom()
-  roomStore.setAsRead(props.roomId)
+  lastMessageObserver.value?.disconnect()
+  lastMessageObserver.value = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      roomStore.setAsRead(props.roomId)
+    }
+  }, { threshold: 0.5 })
+  lastMessageObserver.value.observe(document.getElementById('last_message'))
 }, { flush: 'post' })
+
+watch(() => props.chatEvent, () => {
+  if (!props.chatEvent) return
+  let scroll = false
+  switch (props.chatEvent) {
+    case 'message_sent':
+      scroll = true
+      break;
+    case 'new_received_message':
+      if (scrollBottomPos.value >= messagesParent.value.scrollHeight - messagesParent.value?.clientHeight / 2) scroll = true
+      break;
+    default:
+      break;
+  }
+  if (scroll) setTimeout(() => scrollToBottom(), 100)
+  roomStore.resetRoomEvent(props.roomId)
+}, { flush: 'pre' })
 
 onMounted(() => {
   scrollToBottom()
   messagesParent.value?.addEventListener('scroll', updateScrollPos)
   messagesParent.value.classList.add('scroll-smooth')
+
 })
 
 watch(() => props.roomId, () => {
@@ -56,10 +87,12 @@ watch(() => props.roomId, () => {
 
 onUnmounted(() => {
   messagesParent.value?.removeEventListener('scroll', updateScrollPos)
+  lastMessageObserver.value?.disconnect()
 })
 
 function scrollToBottom() {
   messagesParent.value.scrollTop = messagesParent.value.scrollHeight
+  roomStore.setAsRead(props.roomId)
 }
 
 function updateScrollPos(ev) {
@@ -101,7 +134,7 @@ function isSenderCurrentUser(currentMessageObject) {
           {{ getInitials(messageData.user_name) }}
         </span>
         <div onclick class=" w-full gap-2 text-sm font-medium group relative" :class="messageData.user_name === authStore.username ? 'mr-3 flex justify-end' : 'ml-3'">
-          <p class=" relative p-2 rounded-xl w-fit max-w-[75%] md:max-w-[68%] lg:max-w-[63%] xl:max-w-[56%] " :class="isSenderCurrentUser(messageData) ? 'bg-secondary dark:bg-primary ' : 'bg-white dark:bg-secondary-dark'">
+          <p :id="index === messagesData.length - 1 ? 'last_message' : ''" class=" relative p-2 rounded-xl w-fit max-w-[75%] md:max-w-[68%] lg:max-w-[63%] xl:max-w-[56%] " :class="isSenderCurrentUser(messageData) ? 'bg-secondary dark:bg-primary ' : 'bg-white dark:bg-secondary-dark'">
             {{ messageData.message }}
             <div class=" absolute top-[50%] gap-2 flex justify-center items-center -translate-y-[50%]" :class="isSenderCurrentUser(messageData) ? 'right-[100%] -translate-x-[10px]' : 'left-[100%] translate-x-[10px]'">
               <span class=" text-xs font-bold group-hover:opacity-100 opacity-0 transition-all duration-300" :class="[isSenderCurrentUser(messageData) ? 'translate-x-[40px] group-hover:translate-x-0' : '', {'opacity-100': showTime}]">

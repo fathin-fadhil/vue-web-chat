@@ -111,6 +111,12 @@ export const useRoomStore = defineStore('room', () => {
     }
   }
 
+  function resetRoomEvent(roomId) {
+    const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
+    joinedRooms.value[roomIndex]['event'] = ''
+    localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
+  }
+
   function joinRoomWebSocket(roomId){
     const newSocket = io(import.meta.env.VITE_BASE_URL, {
       query: {
@@ -123,16 +129,22 @@ export const useRoomStore = defineStore('room', () => {
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       joinedRooms.value[roomIndex].messages = [...joinedRooms.value[roomIndex].messages, messageData]
       joinedRooms.value[roomIndex]['hasUnread'] = true
+      if (messageData.user_name === authStore.username) {
+        joinedRooms.value[roomIndex]['event'] = 'message_sent'
+      } else {
+        joinedRooms.value[roomIndex]['event'] = 'new_received_message'
+      }
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
     })
     newSocket.on('delete_message', ({messageId}) => {      
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       joinedRooms.value[roomIndex].messages = joinedRooms.value[roomIndex].messages.filter(message => message.id !== messageId)
+      joinedRooms.value[roomIndex]['event'] = 'delete_message'
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
     })
 
     socketConnection.value[roomId] = newSocket
   }
 
-  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom, deleteMessage, sortedJoinedRooms, setAsRead }
+  return { rooms, joinedRooms, getRooms, searchRoomByName, joinRoom, sendMessageToRoomId, exitRoom, checkAlreadyInRoom, searchJoinedRoomByName, resetState, updateAllJoinedRoomMessages, createNewRoom, deleteMessage, sortedJoinedRooms, setAsRead, resetRoomEvent }
 })
