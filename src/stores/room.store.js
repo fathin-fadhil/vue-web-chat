@@ -14,7 +14,7 @@ export const useRoomStore = defineStore('room', () => {
   const messagesByRoomId = ref(JSON.parse(localStorage.getItem('messagesByRoomId')) || {})
   const socketConnection = ref({})
   const sortedJoinedRooms = computed(() => {
-    return joinedRooms.value.toSorted((roomA, roomB) => new Date(roomB.messages.at(-1)?.createdAt || 0) - new Date(roomA.messages.at(-1)?.createdAt || 0))
+    return joinedRooms.value.toSorted((roomA, roomB) => new Date(messagesByRoomId.value[roomB.id].at(-1)?.createdAt || 0) - new Date(messagesByRoomId.value[roomA.id].at(-1)?.createdAt || 0))
   })
 
   
@@ -46,10 +46,15 @@ export const useRoomStore = defineStore('room', () => {
   async function joinRoom(roomId) {
     try {
       const res = await axiosApiClient.get(`/api/v1/room/${roomId}`)
+      
+      messagesByRoomId.value[roomId] = [...res.data.data.messages]
       joinedRooms.value = [...joinedRooms.value, res.data.data]
-      messagesByRoomId.value[roomId] = res.data.data.messages
+      const joinedRoomsObj = res.data.data
+      delete joinedRoomsObj.messages
+
       localStorage.setItem('messagesByRoomId', JSON.stringify(messagesByRoomId.value))
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
+
       joinRoomWebSocket(roomId)
     } catch (error) {
       console.log("🚀 ~ file: room.store.js:48 ~ joinRoom ~ error:", error)      
@@ -109,11 +114,8 @@ export const useRoomStore = defineStore('room', () => {
   async function updateMessagesByRoomId(roomId) {
     try {
       const res = await axiosApiClient.get(`api/v1/room/${roomId}`)
-      const indexOfRoom = joinedRooms.value.findIndex(room => room.id === roomId)
-      //joinedRooms.value[indexOfRoom]['messages'] = res.data.data.messages
       messagesByRoomId.value[roomId] = res.data.data.messages
       localStorage.setItem('messagesByRoomId', JSON.stringify(messagesByRoomId.value))
-      //localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
     } catch (error) {
       console.log("🚀 ~ file: room.store.js:39 ~ joinRoom ~ error:", error)
     }
@@ -133,9 +135,7 @@ export const useRoomStore = defineStore('room', () => {
     })
 
     newSocket.on('new_message', ({messageData}) => {
-      //updateMessagesByRoomId(roomId)
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
-      //joinedRooms.value[roomIndex].messages = [...joinedRooms.value[roomIndex].messages, messageData]
       messagesByRoomId.value[roomId].push(messageData)
       if (messageData.user_name === authStore.username) {
         joinedRooms.value[roomIndex]['event'] = 'message_sent'
@@ -148,7 +148,6 @@ export const useRoomStore = defineStore('room', () => {
     })
     newSocket.on('delete_message', ({messageId}) => {      
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
-      //joinedRooms.value[roomIndex].messages = joinedRooms.value[roomIndex].messages.filter(message => message.id !== messageId)
       messagesByRoomId.value[roomId].splice(messagesByRoomId.value[roomId].findIndex(message => message.id === messageId), 1)
       joinedRooms.value[roomIndex]['event'] = 'delete_message'
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))

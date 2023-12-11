@@ -114,13 +114,13 @@ const enterTransDone = ref(false)
               <div class=" grow text-sm min-h-[69px] flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
                 <div class=" flex align-bottom">
                   <p class=" font-bold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
-                  <span v-if="room.messages.length > 0" class=" text-xs shrink-0">
-                    {{ formatTimeString(room.messages.at(-1)?.createdAt) }}
+                  <span v-if="roomStore.messagesByRoomId[room.id].length > 0" class=" text-xs shrink-0">
+                    {{ formatTimeString(roomStore.messagesByRoomId[room.id].at(-1)?.createdAt) }}
                   </span>
                 </div>
-                <div v-if="room.messages.length > 0" class="flex gap-2">
+                <div v-if="roomStore.messagesByRoomId[room.id].length > 0" class="flex gap-2">
                   <p class="grow text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden " :class="{'font-bold': room.hasUnread}">
-                    {{ room.messages.at(-1)?.message }}
+                    {{ roomStore.messagesByRoomId[room.id].at(-1)?.message }}
                   </p>
                   <span v-if="room.hasUnread" class=" shrink-0 text-xs grid place-content-center  w-3 h-3 ml-auto rounded-full bg-primary dark:bg-primary-dark"></span>
                 </div>
