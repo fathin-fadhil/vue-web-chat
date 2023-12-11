@@ -20,7 +20,7 @@ const props = defineProps({
 const roomStore = useRoomStore()
 const [ parent ] = useAutoAnimate()
 
-const emits = defineEmits(["toggle"]);
+const emits = defineEmits(["toggle", "exitRoom"]);
 
 function toggleShow(value) {
   emits("toggle", value);
@@ -44,6 +44,10 @@ watch([() => props.showModal], () => {props.showModal && roomStore.getRooms()})
 
 function handleJoin(roomId) {
   roomStore.joinRoom(roomId)
+}
+
+function handleExit(roomId) {
+  emits("exitRoom", roomId);
 }
 </script>
 
@@ -79,7 +83,7 @@ function handleJoin(roomId) {
               </div>
               <div class=" flex justify-center items-center">
                 <PrimaryButton v-if="!roomStore.checkAlreadyInRoom(room.id)" @click="roomStore.joinRoom(room.id)" class=" text-sm !px-4 !py-1">Join</PrimaryButton>
-                <SecondaryButton v-else @click="roomStore.exitRoom(room.id)" class="text-sm !px-4 !py-1">Exit</SecondaryButton>
+                <SecondaryButton v-else @click="handleExit(room.id)" class="text-sm !px-4 !py-1">Exit</SecondaryButton>
               </div>
             </div>
           </div>
