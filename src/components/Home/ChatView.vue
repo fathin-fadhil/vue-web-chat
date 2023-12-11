@@ -10,7 +10,7 @@ import { useRoomStore } from '../../stores/room.store'
 import ConfirmModal from '../Modal/ConfirmModal.vue'
 import ChatBubble from '../icons/ChatBubble.vue'
 
-const [ messagesParent ] = useAutoAnimate()
+const messagesParent = ref()
 const authStore = useAuthStore()
 const roomStore = useRoomStore()
 
@@ -34,24 +34,25 @@ const deleteConfirmModal = ref(false)
 const messageIdToBeDeleted = ref('')
 
 watch(() => props.messagesData, () => {
-  if (messageIdToBeDeleted.value) {
-    messageIdToBeDeleted.value = ''
-    return;
-  }
-   scrollToBottom()
-  messagesParent.value.classList.add('scroll-smooth')
+  scrollToBottom()
   roomStore.setAsRead(props.roomId)
 }, { flush: 'post' })
-
-watch(() => props.messagesData, () => {
-  messagesParent.value.classList.remove('scroll-smooth')
-}, {flush: 'pre'})
 
 onMounted(() => {
   scrollToBottom()
   messagesParent.value?.addEventListener('scroll', updateScrollPos)
   messagesParent.value.classList.add('scroll-smooth')
 })
+
+watch(() => props.roomId, () => {
+  scrollToBottom()
+  messagesParent.value?.addEventListener('scroll', updateScrollPos)
+  messagesParent.value.classList.add('scroll-smooth')
+}, { flush: 'post' })
+
+watch(() => props.roomId, () => {
+  messagesParent.value.classList.remove('scroll-smooth')
+}, {flush: 'pre'})
 
 onUnmounted(() => {
   messagesParent.value?.removeEventListener('scroll', updateScrollPos)
