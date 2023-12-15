@@ -42,8 +42,12 @@ watch([search, () => roomStore.rooms], () => {
 
 watch([() => props.showModal], () => {props.showModal && roomStore.getRooms()})
 
-function handleJoin(roomId) {
-  roomStore.joinRoom(roomId)
+async function handleJoin(roomId, clickEvent) {
+  clickEvent.target.disabled = true
+  clickEvent.target.innerText = 'Joining'
+  await roomStore.joinRoom(roomId)
+  clickEvent.target.disabled = false
+  clickEvent.target.innerText = 'Join'
 }
 
 function handleExit(roomId) {
@@ -82,7 +86,7 @@ function handleExit(roomId) {
                 <p class=" text-xs md:text-sm">Created At: {{ (new Date(room.createdAt)).toDateString() }}</p>
               </div>
               <div class=" flex justify-center items-center">
-                <PrimaryButton v-if="!roomStore.checkAlreadyInRoom(room.id)" @click="roomStore.joinRoom(room.id)" class=" text-sm !px-4 !py-1">Join</PrimaryButton>
+                <PrimaryButton v-if="!roomStore.checkAlreadyInRoom(room.id)" @click="(ev) => {handleJoin(room.id, ev)}" class=" text-sm !px-4 !py-1">Join</PrimaryButton>
                 <SecondaryButton v-else @click="handleExit(room.id)" class="text-sm !px-4 !py-1">Exit</SecondaryButton>
               </div>
             </div>
