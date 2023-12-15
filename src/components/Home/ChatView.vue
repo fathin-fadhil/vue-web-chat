@@ -2,7 +2,7 @@
 import { getInitials } from '../../helper/userHelper';
 import { useAuthStore } from '../../stores/auth.store';
 import { formatChatDateString, getTimeString } from "../../helper/timeFormatter";
-import { onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
 import ChevronLeft from '../icons/ChevronLeft.vue';
 import Trash from '../icons/Trash.vue'
 import { useRoomStore } from '../../stores/room.store'
@@ -13,10 +13,10 @@ const authStore = useAuthStore()
 const roomStore = useRoomStore()
 
 const props = defineProps({
-  messagesData: {
+  /* messagesData: {
     type: Array,
     required: true
-  },
+  }, */
   showTime: {
     type: Boolean,
     required: true
@@ -41,9 +41,11 @@ const deleteConfirmModal = ref(false)
 const messageIdToBeDeleted = ref('')
 const lastMessageObserver = ref()
 
-watch(() => props.messagesData, () => {
+const messagesData = computed(() => roomStore.messagesByRoomId[props.roomId])
+
+watch(() => messagesData.value, () => {
   lastMessageObserver.value?.disconnect()
-  if (props.messagesData.length === 0) return
+  if (messagesData.value.length === 0) return
   lastMessageObserver.value = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) {
       roomStore.setAsRead(props.roomId)
@@ -73,7 +75,6 @@ onMounted(() => {
   scrollToBottom()
   messagesParent.value?.addEventListener('scroll', updateScrollPos)
   messagesParent.value.classList.add('scroll-smooth')
-
 })
 
 watch(() => props.roomId, () => {
@@ -102,7 +103,7 @@ function updateScrollPos(ev) {
 
 function isTheSameSenderOrDifferentDate(currentMessageObject, messageIndex, fromPreviousMessage = true) {
   const indexShift = fromPreviousMessage ? -1 : 1
-  const messageDataToBeCompared = props?.messagesData[messageIndex + indexShift]
+  const messageDataToBeCompared = messagesData.value[messageIndex + indexShift]
   if (fromPreviousMessage && formatChatDateString(currentMessageObject.createdAt) !== formatChatDateString(messageDataToBeCompared?.createdAt)) {
     return false
   }

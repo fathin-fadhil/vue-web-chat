@@ -41,18 +41,14 @@ const exitRoomModal = ref(false)
 const newRoomModal = ref(false)
 
 function handleRoomChange(roomObject) {
-  if (!selectedRoomObject.value) {
-    selectedRoomObject.value = roomObject; 
-    window.history.pushState({}, null, null)
-  } else {
-    selectedRoomObject.value = roomObject; 
-  }
+  if (!selectedRoomObject.value) window.history.pushState({}, null, null)
+  selectedRoomObject.value = roomObject
 }
 
 onMounted(() => {
   addEventListener('popstate', () => {
     if (selectedRoomObject.value) {
-      selectedRoomObject.value = ''
+      selectedRoomObject.value = null
     }
   })
 
@@ -118,13 +114,13 @@ const enterTransDone = ref(false)
               <div class=" grow text-sm min-h-[69px] flex flex-col justify-center min-w-0 border-b-[1px] border-accent/10 dark:border-accent-dark/10 py-3 ">
                 <div class=" flex align-bottom">
                   <p class=" font-bold grow text-base text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden">{{ room.name }}</p>
-                  <span v-if="room.messages.length > 0" class=" text-xs shrink-0">
-                    {{ formatTimeString(room.messages.at(-1)?.createdAt) }}
+                  <span v-if="roomStore.messagesByRoomId[room.id].length > 0" class=" text-xs shrink-0">
+                    {{ formatTimeString(roomStore.messagesByRoomId[room.id].at(-1)?.createdAt) }}
                   </span>
                 </div>
-                <div v-if="room.messages.length > 0" class="flex gap-2">
+                <div v-if="roomStore.messagesByRoomId[room.id].length > 0" class="flex gap-2">
                   <p class="grow text-ellipsis inline-block w-full whitespace-nowrap overflow-hidden " :class="{'font-bold': room.hasUnread}">
-                    {{ room.messages.at(-1)?.message }}
+                    {{ roomStore.messagesByRoomId[room.id].at(-1)?.message }}
                   </p>
                   <span v-if="room.hasUnread" class=" shrink-0 text-xs grid place-content-center  w-3 h-3 ml-auto rounded-full bg-primary dark:bg-primary-dark"></span>
                 </div>
@@ -147,7 +143,7 @@ const enterTransDone = ref(false)
             <ChatMoreOption @timeToggleClick="() => showTime = !showTime" @exitRoomClick="() => exitRoomModal = true" :showTime="showTime" />
           </div>
           <div class=" h-1 grow-[2] z-0">
-            <ChatView :showTime="showTime" :roomId="selectedRoomObject.id" :chatEvent="selectedRoomObject.event ?? ''" :messagesData="selectedRoomObject.messages" :hasUnread="selectedRoomObject.hasUnread ?? false" />
+            <ChatView :showTime="showTime" :roomId="selectedRoomObject.id" :chatEvent="selectedRoomObject.event ?? ''"  :hasUnread="selectedRoomObject.hasUnread ?? false" />
           </div>
           <div class="shrink-0">
             <MessageInput :enterTransDone="enterTransDone" :roomId="selectedRoomObject.id"/>
@@ -164,7 +160,7 @@ const enterTransDone = ref(false)
   </main>
 
   <ConfirmModal @confirmClick="authStore.logout" @toggle="(value) => logoutModal = value " :showModal="logoutModal" title="Logout" body="Are you sure?" confirmText="Logout" />
-  <BrowseRoom @toggle="(value) => browseModal = value" :showModal="browseModal" />
+  <BrowseRoom @toggle="(value) => browseModal = value" :showModal="browseModal" @exitRoom="(roomId) => {selectedRoomObject = null; roomStore.exitRoom(roomId) }" />
   <ConfirmModal @confirmClick="() => {roomStore.exitRoom(selectedRoomObject.id); selectedRoomObject = null; exitRoomModal = false}"  @toggle="(value) => exitRoomModal = value" :showModal="exitRoomModal" title="Exit" body="Exit from this room?" confirmText="Exit" />
   <CreateNewRoom :showModal="newRoomModal" @toggle="(value) => newRoomModal = value" />
 </template>
