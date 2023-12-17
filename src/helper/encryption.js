@@ -58,6 +58,76 @@ export async function decryptText(privateKeyString, encryptedData) {
   return decryptedText;
 }
 
+export async function generateSymmetricKey() {
+  try {
+    const key = await window.crypto.subtle.generateKey(
+      {
+        name: "AES-GCM",
+        length: 256
+      },
+      true,
+      ["encrypt", "decrypt"]
+    );
+
+    const exportedKey = await window.crypto.subtle.exportKey("raw", key);
+    const keyString = arrayBufferToBase64(exportedKey);
+
+    return keyString;
+  } catch (error) {
+    console.error("Error generating symmetric key:", error);
+  }
+}
+
+export async function encryptWithSymmetricKey(symmetricKeyString, text) {
+  try {
+    const symmetricKey = await importSymmetricKey(symmetricKeyString);
+
+    const encodedText = new TextEncoder().encode(text);
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+
+    const encryptedBuffer = await window.crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv: iv
+      },
+      symmetricKey,
+      encodedText
+    );
+
+    const encryptedData = {
+      ciphertext: arrayBufferToBase64(encryptedBuffer),
+      iv: arrayBufferToBase64(iv)
+    };
+
+    return encryptedData;
+  } catch (error) {
+    console.error("Error encrypting text with symmetric key:", error);
+  }
+}
+
+export async function decryptWithSymmetricKey(symmetricKeyString, encryptedData) {
+  try {
+    const symmetricKey = await importSymmetricKey(symmetricKeyString);
+
+    const encryptedBuffer = base64ToArrayBuffer(encryptedData.ciphertext);
+    const iv = base64ToArrayBuffer(encryptedData.iv);
+
+    const decryptedBuffer = await window.crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: iv
+      },
+      symmetricKey,
+      encryptedBuffer
+    );
+
+    const decryptedText = new TextDecoder().decode(decryptedBuffer);
+    return decryptedText;
+  } catch (error) {
+    console.error("Error decrypting text with symmetric key:", error);
+  }
+}
+
 // Helper functions
 function base64ToArrayBuffer(base64) {
   const binaryString = atob(base64);
@@ -71,4 +141,11 @@ function base64ToArrayBuffer(base64) {
 
 function arrayBufferToBase64(buffer) {
   return btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)));
+}
+
+async function importSymmetricKey(keyString) {
+  const keyData = base64ToArrayBuffer(keyString);
+  return await window.crypto.subtle.importKey("raw", keyData, {
+    name: "AES-GCM"
+  }, false, ["encrypt", "decrypt"]);
 }
