@@ -25,11 +25,13 @@ import ChatView from '../../components/Home/ChatView.vue'
 import Primary from "../../components/Button/Primary.vue";
 import BrowseRoom from "../../components/Modal/BrowseRoom.vue";
 import ConfirmModal from "../../components/Modal/ConfirmModal.vue";
+import { useKeyStore } from '../../stores/key.store';
 
 const themeStore = useThemeStore()
 const authStore = useAuthStore()
 const roomStore = useRoomStore()
 const [ roomsParent ] = useAutoAnimate()
+const keyStore = useKeyStore()
 
 const selectedRoomObject = ref(null)
 const search = ref('')
