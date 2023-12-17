@@ -1,61 +1,73 @@
 export async function generateKeyPair() {
-  const keyPair = await window.crypto.subtle.generateKey(
-    {
-      name: "RSA-OAEP",
-      modulusLength: 2048,
-      publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-      hash: "SHA-256"
-    },
-    true,
-    ["encrypt", "decrypt"]
-  );
-
-  const exportPublic = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
-  const exportPrivate = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
-
-  const generatedPublicKey = arrayBufferToBase64(exportPublic);
-  const generatedPrivateKey = arrayBufferToBase64(exportPrivate);
-
-  return { generatedPublicKey, generatedPrivateKey}
+  try {
+    const keyPair = await window.crypto.subtle.generateKey(
+      {
+        name: "RSA-OAEP",
+        modulusLength: 2048,
+        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+        hash: "SHA-256"
+      },
+      true,
+      ["encrypt", "decrypt"]
+    );
+  
+    const exportPublic = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
+    const exportPrivate = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+  
+    const generatedPublicKey = arrayBufferToBase64(exportPublic);
+    const generatedPrivateKey = arrayBufferToBase64(exportPrivate);
+  
+    return { generatedPublicKey, generatedPrivateKey}
+  } catch (error) {
+    console.error("Error generating key pair:", error);
+  }
 }
 
 export async function encryptText(publicKeyString, text) {
-  const keyData = base64ToArrayBuffer(publicKeyString);
-  const publicKey = await window.crypto.subtle.importKey("spki", keyData, {
-    name: "RSA-OAEP",
-    hash: "SHA-256"
-  }, false, ["encrypt"]);
-
-  const encodedText = new TextEncoder().encode(text);
-  const encryptedBuffer = await window.crypto.subtle.encrypt(
-    {
-      name: "RSA-OAEP"
-    },
-    publicKey,
-    encodedText
-  );
-
-  return arrayBufferToBase64(encryptedBuffer);
+  try {
+    const keyData = base64ToArrayBuffer(publicKeyString);
+    const publicKey = await window.crypto.subtle.importKey("spki", keyData, {
+      name: "RSA-OAEP",
+      hash: "SHA-256"
+    }, false, ["encrypt"]);
+  
+    const encodedText = new TextEncoder().encode(text);
+    const encryptedBuffer = await window.crypto.subtle.encrypt(
+      {
+        name: "RSA-OAEP"
+      },
+      publicKey,
+      encodedText
+    );
+  
+    return arrayBufferToBase64(encryptedBuffer);
+  } catch (error) {
+    console.error("Error encrypting text:", error); 
+  }
 }
 
 export async function decryptText(privateKeyString, encryptedData) {
-  const keyData = base64ToArrayBuffer(privateKeyString);
-  const privateKey = await window.crypto.subtle.importKey("pkcs8", keyData, {
-    name: "RSA-OAEP",
-    hash: "SHA-256"
-  }, false, ["decrypt"]);
-
-  const encryptedBuffer = base64ToArrayBuffer(encryptedData);
-  const decryptedBuffer = await window.crypto.subtle.decrypt(
-    {
-      name: "RSA-OAEP"
-    },
-    privateKey,
-    encryptedBuffer
-  );
-
-  const decryptedText = new TextDecoder().decode(decryptedBuffer);
-  return decryptedText;
+  try {
+    const keyData = base64ToArrayBuffer(privateKeyString);
+    const privateKey = await window.crypto.subtle.importKey("pkcs8", keyData, {
+      name: "RSA-OAEP",
+      hash: "SHA-256"
+    }, false, ["decrypt"]);
+  
+    const encryptedBuffer = base64ToArrayBuffer(encryptedData);
+    const decryptedBuffer = await window.crypto.subtle.decrypt(
+      {
+        name: "RSA-OAEP"
+      },
+      privateKey,
+      encryptedBuffer
+    );
+  
+    const decryptedText = new TextDecoder().decode(decryptedBuffer);
+    return decryptedText;
+  } catch (error) {
+    console.error("Error decrypting text:", error); 
+  }
 }
 
 export async function generateSymmetricKey() {
