@@ -22,7 +22,7 @@ export const useRoomStore = defineStore('room', () => {
   
   async function updateAllJoinedRoomMessages() {
     joinedRooms.value.forEach(async (room) => {
-      await updateMessagesByRoomId(room.id)
+      // await updateMessagesByRoomId(room.id)
       joinRoomWebSocket(room.id)
     })
   }
@@ -48,11 +48,11 @@ export const useRoomStore = defineStore('room', () => {
   async function joinRoom(roomId) {
     try {
       const res = await axiosApiClient.get(`/api/v1/room/${roomId}`)
+      const joinedRoomsObj = res.data.data
       
       messagesByRoomId.value[roomId] = []
-      joinedRooms.value = [...joinedRooms.value, res.data.data]
-      const joinedRoomsObj = res.data.data
-      delete joinedRoomsObj.messages
+      joinedRooms.value = [...joinedRooms.value, joinedRoomsObj]
+      //delete joinedRoomsObj.messages
 
       localStorage.setItem('messagesByRoomId', JSON.stringify(messagesByRoomId.value))
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
@@ -138,6 +138,21 @@ export const useRoomStore = defineStore('room', () => {
       }
     })
 
+    newSocket.on('user_joined', (userData) => {
+      const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
+      joinedRooms.value[roomIndex].joinedUser[userData.username] = userData
+      //joinedRooms.value[roomIndex].joinedUser[userData.username] = userData
+      localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
+    })
+
+    newSocket.on('user_left', (userData) => {
+      const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
+      const newJoinedUser = {...joinedRooms.value[roomIndex].joinedUser}
+      delete newJoinedUser[userData.username]
+      joinedRooms.value[roomIndex].joinedUser = newJoinedUser
+      localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
+    })
+
     newSocket.on('new_message', ({messageData}) => {
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       messagesByRoomId.value[roomId].push(messageData)
@@ -150,6 +165,7 @@ export const useRoomStore = defineStore('room', () => {
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
       localStorage.setItem('messagesByRoomId', JSON.stringify(messagesByRoomId.value))
     })
+
     newSocket.on('delete_message', ({messageId}) => {      
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       messagesByRoomId.value[roomId].splice(messagesByRoomId.value[roomId].findIndex(message => message.id === messageId), 1)
