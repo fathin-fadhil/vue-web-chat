@@ -102,8 +102,8 @@ export const useRoomStore = defineStore('room', () => {
         }
       }
 
-      console.log("🚀 ~ file: room.store.js:82 ~ sendMessageToRoomId ~ symmetricKey:", symmetricKey)
-      console.log("🚀 ~ file: room.store.js:85 ~ sendMessageToRoomId ~ messageData:", messageData)
+      console.log("generate sym key= ", symmetricKey)
+      console.log("encrypted data = ", messageData)
 
       await axiosApiClient.post('/api/v1/message', {
         room_id: roomId,
@@ -193,6 +193,7 @@ export const useRoomStore = defineStore('room', () => {
     })
 
     newSocket.on('new_message', async (rawMessageData) => {
+      console.log("received encrypted data = ", {...rawMessageData})
       const symmetricKey = await decryptText(keyStore.privateKey, rawMessageData.encryptedKey)
       const message = await decryptWithSymmetricKey(symmetricKey, rawMessageData.encryptedMessageData)
 
@@ -204,7 +205,7 @@ export const useRoomStore = defineStore('room', () => {
         message: message,
       }
 
-      console.log('parsed data', messageData)
+      console.log('parsed data = ', {...messageData})
 
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       messagesByRoomId.value[roomId].push(messageData)
