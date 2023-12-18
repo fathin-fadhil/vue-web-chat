@@ -157,7 +157,7 @@ function isSenderCurrentUser(currentMessageObject) {
     <div v-if="hasUnread" class="w-3 h-3 absolute left-0 bottom-0 bg-primary rounded-full"></div>
   </button>
   <Teleport to="body">
-    <ConfirmModal @confirmClick="() => {roomStore.deleteMessage(messageIdToBeDeleted); deleteConfirmModal = false; }" @toggle="(value) => deleteConfirmModal = value " :showModal="deleteConfirmModal" title="Unsend Message" body="Unsend This Message?" confirmText="Unsend" />
+    <ConfirmModal @confirmClick="() => {roomStore.deleteMessage(messageIdToBeDeleted, roomId); deleteConfirmModal = false; }" @toggle="(value) => deleteConfirmModal = value " :showModal="deleteConfirmModal" title="Unsend Message" body="Unsend This Message?" confirmText="Unsend" />
   </Teleport>
 </template>
 
