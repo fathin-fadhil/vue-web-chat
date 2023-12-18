@@ -1,17 +1,23 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { decryptText, decryptWithSymmetricKey, encryptText, encryptWithSymmetricKey, generateKeyPair, generateSymmetricKey } from '../helper/encryption'
 
 export const useKeyStore = defineStore('key', () => {
   const publicKey = ref('')
   const privateKey = ref('')
 
-  onMounted(async () => {    
+  async function createKeyPair() {
+    const { generatedPrivateKey, generatedPublicKey } = await generateKeyPair()
+    publicKey.value = generatedPublicKey
+    privateKey.value = generatedPrivateKey
+  }
+
+/*   onMounted(async () => {    
     const { generatedPrivateKey, generatedPublicKey } = await generateKeyPair()
     publicKey.value = generatedPublicKey
     privateKey.value = generatedPrivateKey
 
-/*     const symmetricKey = await generateSymmetricKey()
+    const symmetricKey = await generateSymmetricKey()
     console.log("🚀 ~ file: key.store.js:15 ~ onMounted ~ symmetricKey:", symmetricKey)
 
     const encryptedMessage = await encryptWithSymmetricKey(symmetricKey, 'Hello 👌')
@@ -22,8 +28,8 @@ export const useKeyStore = defineStore('key', () => {
     const decryptedSymetricKey = await decryptText(privateKey.value, encryptedSymetricKey)
     console.log("🚀 ~ file: key.store.js:21 ~ onMounted ~ decryptedSymetricKey:", decryptedSymetricKey)
     const decryptedMessage = await decryptWithSymmetricKey(decryptedSymetricKey, encryptedMessage)
-    console.log("🚀 ~ file: key.store.js:24 ~ onMounted ~ decryptedMessage:", decryptedMessage) */
-  })
+    console.log("🚀 ~ file: key.store.js:24 ~ onMounted ~ decryptedMessage:", decryptedMessage)
+  }) */
 
-  return { publicKey, privateKey }
+  return { publicKey, privateKey, createKeyPair }
 })

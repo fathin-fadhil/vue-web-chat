@@ -47,17 +47,18 @@ function handleRoomChange(roomObject) {
   selectedRoomObject.value = roomObject
 }
 
-onMounted(() => {
+onMounted(async () => {
   addEventListener('popstate', () => {
     if (selectedRoomObject.value) {
       selectedRoomObject.value = null
     }
   })
-
+  
   if (roomStore.joinedRooms?.length === 0) {
     browseModal.value = true
   }
-
+  
+  await keyStore.createKeyPair()
   roomStore.updateAllJoinedRoomMessages()
 })
 

@@ -4,10 +4,12 @@ import useAxiosApiClient from "../helper/useAxiosApiClient";
 import { useAuthStore } from "./auth.store";
 import { io } from "socket.io-client";
 import { computed } from "vue";
+import { useKeyStore } from "./key.store";
 
 export const useRoomStore = defineStore('room', () => {
   const axiosApiClient = useAxiosApiClient()
   const authStore = useAuthStore()
+  const keyStore = useKeyStore()
 
   const rooms = ref(JSON.parse(localStorage.getItem('rooms')) || [])
   const joinedRooms = ref(JSON.parse(localStorage.getItem('joinedRooms')) || [])
@@ -47,7 +49,7 @@ export const useRoomStore = defineStore('room', () => {
     try {
       const res = await axiosApiClient.get(`/api/v1/room/${roomId}`)
       
-      messagesByRoomId.value[roomId] = [...res.data.data.messages]
+      messagesByRoomId.value[roomId] = []
       joinedRooms.value = [...joinedRooms.value, res.data.data]
       const joinedRoomsObj = res.data.data
       delete joinedRoomsObj.messages
@@ -130,7 +132,9 @@ export const useRoomStore = defineStore('room', () => {
   function joinRoomWebSocket(roomId){
     const newSocket = io(import.meta.env.VITE_BASE_URL, {
       query: {
-        'room_id': roomId
+        'room_id': roomId,
+        'username': authStore.username,
+        'public_key': keyStore.publicKey
       }
     })
 
