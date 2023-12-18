@@ -72,10 +72,13 @@ export const useRoomStore = defineStore('room', () => {
     socketConnection.value[roomId].disconnect()
   }
 
-  async function exitAllSocketRoom() {
-    joinedRooms.value.forEach(room => {
-      console.log('exitAllSocketRoom', room.id)
-      socketConnection.value[room.id].disconnect()
+  function exitAllSocketRoom() {
+    return new Promise((resolve, reject) => {
+      joinedRooms.value.forEach(room => {
+        console.log('exitAllSocketRoom', room.id)
+        socketConnection.value[room.id].disconnect()
+      })      
+      resolve()
     })
   }
 
@@ -140,11 +143,11 @@ export const useRoomStore = defineStore('room', () => {
     localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
   }
 
-  function resetState() {
+  async function resetState() {
+    await exitAllSocketRoom()
     rooms.value = []
     joinedRooms.value = []
     messagesByRoomId.value = {}
-    exitAllSocketRoom()
   }
 
   async function updateMessagesByRoomId(roomId) {

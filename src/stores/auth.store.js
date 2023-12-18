@@ -15,9 +15,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     function logout() {
-        username.value = null;
-        localStorage.clear();
         roomStore.resetState()
+        localStorage.clear();
+        username.value = null;
         router.push({ name: 'login'})
     }
 
