@@ -5,6 +5,7 @@ import { useAuthStore } from "./auth.store";
 import { io } from "socket.io-client";
 import { computed } from "vue";
 import { useKeyStore } from "./key.store";
+import { decryptText, decryptWithSymmetricKey, encryptText, encryptWithSymmetricKey, generateSymmetricKey } from "../helper/encryption";
 
 export const useRoomStore = defineStore('room', () => {
   const axiosApiClient = useAxiosApiClient()
@@ -71,17 +72,49 @@ export const useRoomStore = defineStore('room', () => {
     socketConnection.value[roomId].disconnect()
   }
 
+  async function exitAllSocketRoom() {
+    joinedRooms.value.forEach(room => {
+      console.log('exitAllSocketRoom', room.id)
+      socketConnection.value[room.id].disconnect()
+    })
+  }
+
   function checkAlreadyInRoom(roomId) {
     return joinedRooms.value.find(room => room.id === roomId)
   }
 
   async function sendMessageToRoomId(roomId, message) {
     try {
-      const res = await axiosApiClient.post('/api/v1/message', {
+      const messageData = {}
+      const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
+      const usersInRoom = joinedRooms.value[roomIndex].joinedUser
+
+      const symmetricKey = await generateSymmetricKey()
+      messageData.encryptedMessageData = await encryptWithSymmetricKey(symmetricKey, message)
+      messageData.encryptedKeys = {}
+      for (const username in usersInRoom) {
+        messageData.encryptedKeys[usersInRoom[username].socket_id] = {
+          to: username,
+          encryptedKey: await encryptText(usersInRoom[username].public_key, symmetricKey),
+        }
+      }
+
+      console.log("🚀 ~ file: room.store.js:82 ~ sendMessageToRoomId ~ symmetricKey:", symmetricKey)
+      console.log("🚀 ~ file: room.store.js:85 ~ sendMessageToRoomId ~ messageData:", messageData)
+
+      await axiosApiClient.post('/api/v1/message', {
+        room_id: roomId,
+        user_name: authStore.username,
+        messageData: messageData,
+        id: Math.random().toString(36).substr(2, 12),
+        createdAt: new Date().toISOString(),
+      })
+
+      /* const res = await axiosApiClient.post('/api/v1/message', {
         room_id: roomId,
         user_name: authStore.username,
         message: message,
-      })
+      }) */
     } catch (error) {
       console.log("🚀 ~ file: room.store.js:65 ~ sendMessageToRoomId ~ error:", error)      
     }
@@ -111,6 +144,7 @@ export const useRoomStore = defineStore('room', () => {
     rooms.value = []
     joinedRooms.value = []
     messagesByRoomId.value = {}
+    exitAllSocketRoom()
   }
 
   async function updateMessagesByRoomId(roomId) {
@@ -153,7 +187,20 @@ export const useRoomStore = defineStore('room', () => {
       localStorage.setItem('joinedRooms', JSON.stringify(joinedRooms.value))
     })
 
-    newSocket.on('new_message', ({messageData}) => {
+    newSocket.on('new_message', async (rawMessageData) => {
+      const symmetricKey = await decryptText(keyStore.privateKey, rawMessageData.encryptedKey)
+      const message = await decryptWithSymmetricKey(symmetricKey, rawMessageData.encryptedMessageData)
+
+      delete rawMessageData.encryptedKey
+      delete rawMessageData.encryptedMessageData
+
+      const messageData = {
+        ...rawMessageData,
+        message: message,
+      }
+
+      console.log('parsed data', messageData)
+
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       messagesByRoomId.value[roomId].push(messageData)
       if (messageData.user_name === authStore.username) {
