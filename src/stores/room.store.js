@@ -173,6 +173,7 @@ export const useRoomStore = defineStore('room', () => {
     })
 
     newSocket.on('user_joined', (userData) => {
+      console.log("user join", userData.username)
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       joinedRooms.value[roomIndex].joinedUser[userData.username] = userData
       //joinedRooms.value[roomIndex].joinedUser[userData.username] = userData
@@ -180,6 +181,7 @@ export const useRoomStore = defineStore('room', () => {
     })
 
     newSocket.on('user_left', (userData) => {
+      console.log("user left", userData)
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       const newJoinedUser = {...joinedRooms.value[roomIndex].joinedUser}
       delete newJoinedUser[userData.username]
