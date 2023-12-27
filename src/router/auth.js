@@ -1,6 +1,8 @@
 import LoginView from '@/views/auth/login/index.vue'
 import RegisterView from '@/views/auth/register/index.vue'
 
+import MainLayout from '../layouts/MainLayout.vue'
+
 // middleware
 import GuestMiddleware from '@/middleware/guest.middleware.js';
 
@@ -10,6 +12,7 @@ export default [{
     component: LoginView,
     meta: {
       title: 'Login',
+      layout: MainLayout,
       middleware: [GuestMiddleware],
     },
   },

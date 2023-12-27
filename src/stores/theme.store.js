@@ -27,17 +27,25 @@ export const useThemeStore = defineStore("theme", () => {
     }
   }
 
-  onMounted(() => {
+  function registerResizeListener() {
+    addEventListener('resize', updateBreakpoint)    
+  }
+
+  function unregisterResizeListener() {
+    removeEventListener('resize', updateBreakpoint)
+  }
+
+  /* onMounted(() => {
     addEventListener('resize', updateBreakpoint)    
   })
 
   onUnmounted(() => {
     removeEventListener('resize', updateBreakpoint)
-  })
+  }) */
 
   function updateBreakpoint() {
     activeBreakpoint.value = getActiveBrekpoint()
   }
 
-  return { isDarkTheme, activeBreakpoint, toggleTheme };
+  return { isDarkTheme, activeBreakpoint, toggleTheme, registerResizeListener, unregisterResizeListener };
 })
