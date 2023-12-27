@@ -59,7 +59,8 @@ async function addEmoji(emojiEvent) {
 
 onMounted(() => {
   emojiPickerRef.value.addEventListener('emoji-click', addEmoji)
-  draftStore.messageDraftByRoomId[props.roomId] = ''
+  //draftStore.messageDraftByRoomId[props.roomId] = ''
+  draftStore.messageDraftByRoomId[props.roomId] = draftStore.messageDraftByRoomId[props.roomId] ?? ''
 })
 
 onBeforeUnmount(() => emojiPickerRef.value.removeEventListener('emoji-click', addEmoji))
