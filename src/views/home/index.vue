@@ -159,7 +159,7 @@ const enterTransDone = ref(false)
     </section>
   </main>
 
-  <ConfirmModal @confirmClick="authStore.logout" @toggle="(value) => logoutModal = value " :showModal="logoutModal" title="Logout" body="Are you sure?" confirmText="Logout" />
+  <ConfirmModal @confirmClick="() => {selectedRoomObject = null; authStore.logout()}" @toggle="(value) => logoutModal = value " :showModal="logoutModal" title="Logout" body="Are you sure?" confirmText="Logout" />
   <BrowseRoom @toggle="(value) => browseModal = value" :showModal="browseModal" @exitRoom="(roomId) => {selectedRoomObject = null; roomStore.exitRoom(roomId) }" />
   <ConfirmModal @confirmClick="() => {roomStore.exitRoom(selectedRoomObject.id); selectedRoomObject = null; exitRoomModal = false}"  @toggle="(value) => exitRoomModal = value" :showModal="exitRoomModal" title="Exit" body="Exit from this room?" confirmText="Exit" />
   <CreateNewRoom :showModal="newRoomModal" @toggle="(value) => newRoomModal = value" />
