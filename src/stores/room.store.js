@@ -176,7 +176,7 @@ export const useRoomStore = defineStore('room', () => {
     })
 
     newSocket.on('user_joined', (userData) => {
-      console.log("user join", userData.username)
+      console.log("user join", userData)
       const roomIndex = joinedRooms.value.findIndex(room => room.id === roomId)
       joinedRooms.value[roomIndex].joinedUser[userData.username] = userData
       //joinedRooms.value[roomIndex].joinedUser[userData.username] = userData
