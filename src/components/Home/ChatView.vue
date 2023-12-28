@@ -43,7 +43,7 @@ const lastMessageObserver = ref()
 
 const messagesData = computed(() => roomStore.messagesByRoomId[props.roomId])
 
-watch(() => messagesData.value, () => {
+watch(messagesData, () => {
   lastMessageObserver.value?.disconnect()
   if (messagesData.value.length === 0) return
   lastMessageObserver.value = new IntersectionObserver((entries) => {
@@ -52,7 +52,7 @@ watch(() => messagesData.value, () => {
     }
   }, { threshold: 0.5 })
   lastMessageObserver.value.observe(document.getElementById('last_message'))
-}, { flush: 'post' })
+}, { flush: 'post', deep: true })
 
 watch(() => props.chatEvent, () => {
   if (!props.chatEvent) return
