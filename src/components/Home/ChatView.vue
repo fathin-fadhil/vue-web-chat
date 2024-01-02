@@ -52,7 +52,7 @@ watch(() => messagesData.value, () => {
     }
   }, { threshold: 0.5 })
   lastMessageObserver.value.observe(document.getElementById('last_message'))
-}, { flush: 'post' })
+}, { flush: 'post', deep: true })
 
 watch(() => props.chatEvent, () => {
   if (!props.chatEvent) return
